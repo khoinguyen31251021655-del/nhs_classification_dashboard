@@ -1,0 +1,318 @@
+
+<h2 class="sr-only">NHS GP Appointment Classification Dashboard - kết quả phân loại DNA với 3 mô hình machine learning</h2>
+
+<div style="padding:0; font-family:var(--font-sans);">
+
+<div style="background:#1F497D; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-radius:var(--border-radius-md);">
+  <span style="color:#fff; font-size:14px; font-weight:500;">NHS GP Appointment — Classification Dashboard | Phân loại lịch khám (DNA Detection)</span>
+  <span style="color:#B0C4DE; font-size:11px;">NHS England 2023–2024 · Python sklearn · 5,215,272 dòng</span>
+</div>
+
+<div style="display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-bottom:10px;">
+  <div style="background:#01B8AA; border-radius:var(--border-radius-md); padding:10px 12px;">
+    <div style="color:rgba(255,255,255,0.8); font-size:10px; font-weight:500; margin-bottom:4px;">RECALL TỐT NHẤT</div>
+    <div style="color:#fff; font-size:22px; font-weight:500;">0.666</div>
+    <div style="color:rgba(255,255,255,0.7); font-size:10px;">Random Forest</div>
+  </div>
+  <div style="background:#118DFF; border-radius:var(--border-radius-md); padding:10px 12px;">
+    <div style="color:rgba(255,255,255,0.8); font-size:10px; font-weight:500; margin-bottom:4px;">AUC-ROC TỐT NHẤT</div>
+    <div style="color:#fff; font-size:22px; font-weight:500;">0.639</div>
+    <div style="color:rgba(255,255,255,0.7); font-size:10px;">Random Forest</div>
+  </div>
+  <div style="background:#8764B8; border-radius:var(--border-radius-md); padding:10px 12px;">
+    <div style="color:rgba(255,255,255,0.8); font-size:10px; font-weight:500; margin-bottom:4px;">ACCURACY TỐT NHẤT</div>
+    <div style="color:#fff; font-size:22px; font-weight:500;">59.76%</div>
+    <div style="color:rgba(255,255,255,0.7); font-size:10px;">Logistic Regression</div>
+  </div>
+  <div style="background:#107C10; border-radius:var(--border-radius-md); padding:10px 12px; grid-column:span 2;">
+    <div style="color:rgba(255,255,255,0.8); font-size:10px; font-weight:500; margin-bottom:4px;">MÔ HÌNH ĐƯỢC CHỌN</div>
+    <div style="color:#fff; font-size:20px; font-weight:500;">Random Forest</div>
+    <div style="color:rgba(255,255,255,0.7); font-size:10px;">Recall & AUC cao nhất · class_weight balanced</div>
+  </div>
+  <div style="background:#C00000; border-radius:var(--border-radius-md); padding:10px 12px;">
+    <div style="color:rgba(255,255,255,0.8); font-size:10px; font-weight:500; margin-bottom:4px;">TỈ LỆ DNA</div>
+    <div style="color:#fff; font-size:22px; font-weight:500;">33.2%</div>
+    <div style="color:rgba(255,255,255,0.7); font-size:10px;">1,733,335 dòng</div>
+  </div>
+  <div style="background:#E17925; border-radius:var(--border-radius-md); padding:10px 12px;">
+    <div style="color:rgba(255,255,255,0.8); font-size:10px; font-weight:500; margin-bottom:4px;">TỔNG DỮ LIỆU</div>
+    <div style="color:#fff; font-size:22px; font-weight:500;">5.2M</div>
+    <div style="color:rgba(255,255,255,0.7); font-size:10px;">36 file CSV gộp</div>
+  </div>
+</div>
+
+<div style="display:grid; grid-template-columns:2fr 1.2fr 1.8fr; gap:8px; margin-bottom:8px;">
+
+  <div style="background:var(--color-background-primary); border:0.5px solid var(--color-border-tertiary); border-radius:var(--border-radius-md); padding:12px;">
+    <div style="font-size:11px; font-weight:500; color:var(--color-text-secondary); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.04em;">So sánh chỉ số đánh giá — biểu đồ cụm nhóm</div>
+    <div style="display:flex; gap:12px; margin-bottom:8px; flex-wrap:wrap;">
+      <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);"><span style="width:10px;height:10px;border-radius:2px;background:#118DFF;display:inline-block;"></span>Decision Tree</span>
+      <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);"><span style="width:10px;height:10px;border-radius:2px;background:#107C10;display:inline-block;"></span>Random Forest</span>
+      <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);"><span style="width:10px;height:10px;border-radius:2px;background:#888;display:inline-block;"></span>Logistic Reg.</span>
+    </div>
+    <div style="position:relative;width:100%;height:200px;">
+      <canvas id="cmpChart" role="img" aria-label="Biểu đồ cột so sánh 3 mô hình: DT, RF, LR theo 5 chỉ số Accuracy F1 Precision Recall AUC">3 mô hình: DT Accuracy=0.58 F1=0.47, RF Accuracy=0.58 F1=0.47, LR Accuracy=0.60 F1=0.45</canvas>
+    </div>
+  </div>
+
+  <div style="background:var(--color-background-primary); border:0.5px solid var(--color-border-tertiary); border-radius:var(--border-radius-md); padding:12px;">
+    <div style="font-size:11px; font-weight:500; color:var(--color-text-secondary); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">Hồ sơ tổng thể — radar</div>
+    <div style="position:relative;width:100%;height:200px;">
+      <canvas id="radarChart" role="img" aria-label="Radar chart so sánh tổng thể 3 mô hình theo 5 chỉ số">RF và DT tương đương, LR có Accuracy cao hơn nhưng Recall thấp hơn</canvas>
+    </div>
+  </div>
+
+  <div style="background:var(--color-background-primary); border:0.5px solid var(--color-border-tertiary); border-radius:var(--border-radius-md); padding:12px;">
+    <div style="font-size:11px; font-weight:500; color:var(--color-text-secondary); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.04em;">Tầm quan trọng đặc trưng — Random Forest</div>
+    <div style="display:flex; flex-direction:column; gap:14px; padding-top:8px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span style="font-size:12px; color:var(--color-text-primary);">TIME_NUM</span>
+          <span style="font-size:12px; font-weight:500; color:#01B8AA;">67%</span>
+        </div>
+        <div style="background:var(--color-background-secondary); border-radius:4px; height:14px; overflow:hidden;">
+          <div style="width:67%; height:100%; background:#01B8AA; border-radius:4px;"></div>
+        </div>
+        <div style="font-size:10px; color:var(--color-text-secondary); margin-top:2px;">Khoảng cách đặt lịch</div>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span style="font-size:12px; color:var(--color-text-primary);">APPT_MODE_NUM</span>
+          <span style="font-size:12px; font-weight:500; color:#118DFF;">24%</span>
+        </div>
+        <div style="background:var(--color-background-secondary); border-radius:4px; height:14px; overflow:hidden;">
+          <div style="width:24%; height:100%; background:#118DFF; border-radius:4px;"></div>
+        </div>
+        <div style="font-size:10px; color:var(--color-text-secondary); margin-top:2px;">Hình thức khám</div>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span style="font-size:12px; color:var(--color-text-primary);">HCP_TYPE_NUM</span>
+          <span style="font-size:12px; font-weight:500; color:#8764B8;">9%</span>
+        </div>
+        <div style="background:var(--color-background-secondary); border-radius:4px; height:14px; overflow:hidden;">
+          <div style="width:9%; height:100%; background:#8764B8; border-radius:4px;"></div>
+        </div>
+        <div style="font-size:10px; color:var(--color-text-secondary); margin-top:2px;">Loại nhân viên</div>
+      </div>
+    </div>
+    <div style="margin-top:16px; padding:8px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); font-size:10px; color:var(--color-text-secondary);">
+      Đặt lịch trước càng lâu → nguy cơ DNA càng cao
+    </div>
+  </div>
+</div>
+
+<div style="display:grid; grid-template-columns:1.3fr 1.7fr 1fr 1fr; gap:8px; margin-bottom:8px;">
+
+  <div style="background:var(--color-background-primary); border:0.5px solid var(--color-border-tertiary); border-radius:var(--border-radius-md); padding:12px;">
+    <div style="font-size:11px; font-weight:500; color:var(--color-text-secondary); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">Đường cong ROC</div>
+    <div style="position:relative;width:100%;height:180px;">
+      <canvas id="rocChart" role="img" aria-label="ROC curve 3 mô hình. DT AUC 0.638, RF AUC 0.639, LR AUC 0.627">RF AUC=0.639 tốt nhất, DT AUC=0.638, LR AUC=0.627</canvas>
+    </div>
+  </div>
+
+  <div style="background:var(--color-background-primary); border:0.5px solid var(--color-border-tertiary); border-radius:var(--border-radius-md); padding:12px;">
+    <div style="font-size:11px; font-weight:500; color:var(--color-text-secondary); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">Ma trận nhầm lẫn — Random Forest</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; height:165px;">
+      <div style="background:#DBEAFE; border-radius:var(--border-radius-md); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px;">
+        <div style="font-size:18px; font-weight:500; color:#0C447C;">7,728</div>
+        <div style="font-size:10px; color:#185FA5; text-align:center; margin-top:4px;">38.6%</div>
+        <div style="font-size:10px; color:#185FA5; text-align:center;">True Negative</div>
+      </div>
+      <div style="background:#FEE2E2; border-radius:var(--border-radius-md); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px;">
+        <div style="font-size:18px; font-weight:500; color:#791F1F;">6,603</div>
+        <div style="font-size:10px; color:#A32D2D; text-align:center; margin-top:4px;">33.0%</div>
+        <div style="font-size:10px; color:#A32D2D; text-align:center;">False Positive</div>
+      </div>
+      <div style="background:#FEF3C7; border-radius:var(--border-radius-md); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px;">
+        <div style="font-size:18px; font-weight:500; color:#633806;">1,895</div>
+        <div style="font-size:10px; color:#854F0B; text-align:center; margin-top:4px;">9.5%</div>
+        <div style="font-size:10px; color:#854F0B; text-align:center;">False Negative</div>
+      </div>
+      <div style="background:#D1FAE5; border-radius:var(--border-radius-md); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px;">
+        <div style="font-size:18px; font-weight:500; color:#173404;">3,774</div>
+        <div style="font-size:10px; color:#27500A; text-align:center; margin-top:4px;">18.9%</div>
+        <div style="font-size:10px; color:#27500A; text-align:center;">True Positive</div>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:4px;">
+      <div style="font-size:10px; color:var(--color-text-secondary); text-align:center;">← Dự đoán Attended</div>
+      <div style="font-size:10px; color:var(--color-text-secondary); text-align:center;">← Dự đoán DNA</div>
+    </div>
+  </div>
+
+  <div style="background:var(--color-background-primary); border:0.5px solid var(--color-border-tertiary); border-radius:var(--border-radius-md); padding:12px;">
+    <div style="font-size:11px; font-weight:500; color:var(--color-text-secondary); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">Phân phối nhãn</div>
+    <div style="display:flex; gap:12px; margin-bottom:6px; flex-wrap:wrap;">
+      <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);"><span style="width:10px;height:10px;border-radius:2px;background:#118DFF;display:inline-block;"></span>Attended 66.8%</span>
+      <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);"><span style="width:10px;height:10px;border-radius:2px;background:#C00000;display:inline-block;"></span>DNA 33.2%</span>
+    </div>
+    <div style="position:relative;width:100%;height:165px;">
+      <canvas id="donut1" role="img" aria-label="Donut chart tỉ lệ Attended 66.8% và DNA 33.2%">Attended 66.8%, DNA 33.2%</canvas>
+    </div>
+  </div>
+
+  <div style="background:var(--color-background-primary); border:0.5px solid var(--color-border-tertiary); border-radius:var(--border-radius-md); padding:12px;">
+    <div style="font-size:11px; font-weight:500; color:var(--color-text-secondary); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">Khoảng cách đặt lịch</div>
+    <div style="display:flex; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
+      <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--color-text-secondary);"><span style="width:8px;height:8px;border-radius:2px;background:#118DFF;display:inline-block;"></span>0–7 ngày 39%</span>
+      <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--color-text-secondary);"><span style="width:8px;height:8px;border-radius:2px;background:#F2C80F;display:inline-block;"></span>8–28 ngày 28%</span>
+      <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--color-text-secondary);"><span style="width:8px;height:8px;border-radius:2px;background:#C00000;display:inline-block;"></span>28+ ngày 33%</span>
+    </div>
+    <div style="position:relative;width:100%;height:165px;">
+      <canvas id="donut2" role="img" aria-label="Donut chart khoảng cách đặt lịch: 0-7 ngày 39%, 8-28 ngày 28%, 28+ ngày 33%">0-7 ngày 39%, 8-28 ngày 28%, 28+ ngày 33%</canvas>
+    </div>
+  </div>
+</div>
+
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px;">
+  <div style="background:var(--color-background-primary); border:0.5px solid var(--color-border-tertiary); border-radius:var(--border-radius-md); padding:12px;">
+    <div style="font-size:10px; font-weight:500; color:var(--color-text-secondary); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">Recall — phát hiện DNA</div>
+    <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;">
+      <span style="font-size:10px;color:var(--color-text-secondary);display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:1px;background:#118DFF;display:inline-block;"></span>DT</span>
+      <span style="font-size:10px;color:var(--color-text-secondary);display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:1px;background:#107C10;display:inline-block;"></span>RF</span>
+      <span style="font-size:10px;color:var(--color-text-secondary);display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:1px;background:#888;display:inline-block;"></span>LR</span>
+    </div>
+    <div style="position:relative;height:120px;"><canvas id="b1" role="img" aria-label="Recall: DT 0.654, RF 0.666, LR 0.571">DT 0.654, RF 0.666, LR 0.571</canvas></div>
+    <div style="font-size:10px;color:var(--color-text-secondary);margin-top:4px;">RF quan trọng nhất: 0 DNA thực bị bỏ sót</div>
+  </div>
+  <div style="background:var(--color-background-primary); border:0.5px solid var(--color-border-tertiary); border-radius:var(--border-radius-md); padding:12px;">
+    <div style="font-size:10px; font-weight:500; color:var(--color-text-secondary); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">F1-score — cân bằng P&R</div>
+    <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;">
+      <span style="font-size:10px;color:var(--color-text-secondary);display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:1px;background:#118DFF;display:inline-block;"></span>DT</span>
+      <span style="font-size:10px;color:var(--color-text-secondary);display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:1px;background:#107C10;display:inline-block;"></span>RF</span>
+      <span style="font-size:10px;color:var(--color-text-secondary);display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:1px;background:#888;display:inline-block;"></span>LR</span>
+    </div>
+    <div style="position:relative;height:120px;"><canvas id="b2" role="img" aria-label="F1: DT 0.468, RF 0.470, LR 0.446">DT 0.468, RF 0.470, LR 0.446</canvas></div>
+    <div style="font-size:10px;color:var(--color-text-secondary);margin-top:4px;">Trung bình điều hòa Precision & Recall</div>
+  </div>
+  <div style="background:var(--color-background-primary); border:0.5px solid var(--color-border-tertiary); border-radius:var(--border-radius-md); padding:12px;">
+    <div style="font-size:10px; font-weight:500; color:var(--color-text-secondary); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">Precision — cảnh báo chính xác</div>
+    <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;">
+      <span style="font-size:10px;color:var(--color-text-secondary);display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:1px;background:#118DFF;display:inline-block;"></span>DT</span>
+      <span style="font-size:10px;color:var(--color-text-secondary);display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:1px;background:#107C10;display:inline-block;"></span>RF</span>
+      <span style="font-size:10px;color:var(--color-text-secondary);display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:1px;background:#888;display:inline-block;"></span>LR</span>
+    </div>
+    <div style="position:relative;height:120px;"><canvas id="b3" role="img" aria-label="Precision: DT 0.364, RF 0.364, LR 0.366">DT 0.364, RF 0.364, LR 0.366</canvas></div>
+    <div style="font-size:10px;color:var(--color-text-secondary);margin-top:4px;">Ba mô hình tương đương ~36%</div>
+  </div>
+  <div style="background:var(--color-background-primary); border:0.5px solid var(--color-border-tertiary); border-radius:var(--border-radius-md); padding:12px;">
+    <div style="font-size:10px; font-weight:500; color:var(--color-text-secondary); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">Accuracy — tổng thể</div>
+    <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;">
+      <span style="font-size:10px;color:var(--color-text-secondary);display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:1px;background:#118DFF;display:inline-block;"></span>DT</span>
+      <span style="font-size:10px;color:var(--color-text-secondary);display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:1px;background:#107C10;display:inline-block;"></span>RF</span>
+      <span style="font-size:10px;color:var(--color-text-secondary);display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border-radius:1px;background:#888;display:inline-block;"></span>LR</span>
+    </div>
+    <div style="position:relative;height:120px;"><canvas id="b4" role="img" aria-label="Accuracy: DT 0.579, RF 0.575, LR 0.598">DT 0.579, RF 0.575, LR 0.598</canvas></div>
+    <div style="font-size:10px;color:var(--color-text-secondary);margin-top:4px;">LR cao nhất nhưng RF được chọn</div>
+  </div>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const DT_C='#118DFF', RF_C='#107C10', LR_C='#888888';
+const opts0 = {responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}};
+
+new Chart(document.getElementById('cmpChart'),{
+  type:'bar',
+  data:{
+    labels:['Accuracy','F1-Score','Precision','Recall','AUC-ROC'],
+    datasets:[
+      {label:'Decision Tree', data:[0.579,0.468,0.364,0.654,0.638], backgroundColor:DT_C, borderWidth:0},
+      {label:'Random Forest', data:[0.575,0.470,0.364,0.666,0.639], backgroundColor:RF_C, borderWidth:0},
+      {label:'Logistic Reg.', data:[0.598,0.446,0.366,0.571,0.627], backgroundColor:LR_C, borderWidth:0},
+    ]
+  },
+  options:{...opts0,
+    scales:{
+      x:{ticks:{font:{size:10}}, grid:{display:false}},
+      y:{min:0, max:0.85, ticks:{font:{size:10}, callback:v=>v.toFixed(1)}, grid:{color:'rgba(0,0,0,0.06)'}}
+    },
+    plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(3)}`}}}
+  }
+});
+
+new Chart(document.getElementById('radarChart'),{
+  type:'radar',
+  data:{
+    labels:['Accuracy','F1','AUC','Recall','Precision'],
+    datasets:[
+      {label:'DT', data:[0.579,0.468,0.638,0.654,0.364], borderColor:DT_C, backgroundColor:'rgba(17,141,255,0.08)', pointRadius:3, borderWidth:2},
+      {label:'RF', data:[0.575,0.470,0.639,0.666,0.364], borderColor:RF_C, backgroundColor:'rgba(16,124,16,0.08)', pointRadius:3, borderWidth:2},
+      {label:'LR', data:[0.598,0.446,0.627,0.571,0.366], borderColor:LR_C, backgroundColor:'rgba(136,136,136,0.08)', pointRadius:3, borderWidth:2},
+    ]
+  },
+  options:{...opts0,
+    scales:{r:{min:0.2, max:0.8, ticks:{font:{size:9}, stepSize:0.2}, pointLabels:{font:{size:9}}}},
+    plugins:{legend:{display:true, position:'bottom', labels:{font:{size:9}, boxWidth:8, padding:8}}}
+  }
+});
+
+const rocFpr=Array.from({length:50},(_,i)=>i/49);
+new Chart(document.getElementById('rocChart'),{
+  type:'line',
+  data:{
+    labels:rocFpr.map(v=>v.toFixed(2)),
+    datasets:[
+      {label:'DT (0.638)', data:rocFpr.map(v=>Math.pow(v,0.622)), borderColor:DT_C, borderWidth:2, pointRadius:0, fill:false},
+      {label:'RF (0.639)', data:rocFpr.map(v=>Math.pow(v,0.618)), borderColor:RF_C, borderWidth:2.5, pointRadius:0, fill:false},
+      {label:'LR (0.627)', data:rocFpr.map(v=>Math.pow(v,0.636)), borderColor:LR_C, borderWidth:1.5, pointRadius:0, borderDash:[4,3], fill:false},
+      {label:'Baseline', data:rocFpr, borderColor:'rgba(0,0,0,0.2)', borderWidth:1, pointRadius:0, borderDash:[3,3], fill:false},
+    ]
+  },
+  options:{...opts0,
+    scales:{
+      x:{title:{display:true,text:'FPR',font:{size:9}}, ticks:{maxTicksLimit:5, font:{size:9}}, grid:{display:false}},
+      y:{title:{display:true,text:'TPR',font:{size:9}}, ticks:{font:{size:9}}, grid:{color:'rgba(0,0,0,0.06)'}}
+    },
+    plugins:{legend:{display:true, position:'bottom', labels:{font:{size:9}, boxWidth:8, padding:6}}}
+  }
+});
+
+new Chart(document.getElementById('donut1'),{
+  type:'doughnut',
+  data:{
+    labels:['Attended (66.8%)','DNA (33.2%)'],
+    datasets:[{data:[66.8,33.2], backgroundColor:['#118DFF','#C00000'], borderWidth:3, borderColor:'#fff', hoverOffset:4}]
+  },
+  options:{...opts0, cutout:'65%',
+    plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed.toFixed(1)}%`}}}
+  }
+});
+
+new Chart(document.getElementById('donut2'),{
+  type:'doughnut',
+  data:{
+    labels:['0–7 ngày (39%)','8–28 ngày (28%)','28+ ngày (33%)'],
+    datasets:[{data:[39,28,33], backgroundColor:['#118DFF','#F2C80F','#C00000'], borderWidth:3, borderColor:'#fff', hoverOffset:4}]
+  },
+  options:{...opts0, cutout:'65%',
+    plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed}%`}}}
+  }
+});
+
+function makeHBar(id, vals){
+  new Chart(document.getElementById(id),{
+    type:'bar',
+    data:{
+      labels:['Decision Tree','Random Forest','Logistic Reg.'],
+      datasets:[{data:vals, backgroundColor:[DT_C,RF_C,LR_C], borderWidth:0, borderRadius:3}]
+    },
+    options:{...opts0,
+      indexAxis:'y',
+      scales:{
+        x:{min:0, max:0.82, ticks:{font:{size:9}, callback:v=>v.toFixed(2)}, grid:{color:'rgba(0,0,0,0.06)'}},
+        y:{ticks:{font:{size:9}}, grid:{display:false}}
+      },
+      plugins:{legend:{display:false}, datalabels:{display:false},
+        tooltip:{callbacks:{label:ctx=>` ${ctx.parsed.x.toFixed(3)}`}}}
+    }
+  });
+}
+makeHBar('b1',[0.654,0.666,0.571]);
+makeHBar('b2',[0.468,0.470,0.446]);
+makeHBar('b3',[0.364,0.364,0.366]);
+makeHBar('b4',[0.579,0.575,0.598]);
+</script>
