@@ -150,6 +150,12 @@ báo cáo độ nhạy của kết quả với cách chia (tham số `--seed` c�
   tích tại sao protocol evidence có thể redundant/tăng false alarm (xem
   bằng chứng cụ thể về S2 vs S3 ở `docs/leakage_evidence.md`, phần
   `mb_duplicate_flag` không phân biệt được 2 scenario này).
+- Chạy thử thật (`docs/validation_run.md`) cho accuracy = 1.000 tuyệt đối ở
+  E2/E3 — **đừng đưa con số này vào bài như một thành tựu mà không giải
+  thích**: nó phản ánh việc S3 trong dataset có mật độ đọc cao hơn S1/S2 tới
+  25–600 lần, một khoảng cách lớn hơn nhiều so với một attacker thực tế cố
+  giấu dấu vết. Đọc kỹ phát hiện 2 trong `docs/validation_run.md` trước khi
+  viết Limitations (5.3).
 
 ## 6. File trong thư mục này
 
@@ -164,11 +170,11 @@ rfid_clone_detection/
 └── docs/
     ├── colab_quickstart.md          # copy-paste cell cho Google Colab
     ├── pycharm_local_setup.md       # chạy bằng terminal / PyCharm local
-    └── leakage_evidence.md          # bằng chứng số liệu thật cho 3.5 + insight S2 vs S3
+    ├── leakage_evidence.md          # bằng chứng số liệu thật cho 3.5 + insight S2 vs S3
+    └── validation_run.md            # kết quả 1 seed chạy thật + cảnh báo accuracy=1.0
 ```
 
-Toàn bộ đã chạy thử thành công trên chính `RFID-ExSim-dataset.zip` nhóm gửi
-(pandas/scikit-learn phần feature+split; phần PySpark `train_detectors.py`
-đã review kỹ theo API `pyspark.ml`/`CrossValidator(foldCol=...)` — nhớ chạy
-thử 1 lượt trên Colab trước khi lấy số final, vì môi trường sandbox này
-không cài được PySpark do lỗi packaging cục bộ không liên quan tới Colab).
+Toàn bộ 3 script — kể cả `train_detectors.py` bằng PySpark thật (Spark
+3.5.1, local mode) — đã chạy thành công end-to-end trên chính
+`RFID-ExSim-dataset.zip` nhóm gửi. Kết quả smoke-test thật (1 seed) và một
+cảnh báo quan trọng cần đọc trước khi viết Limitations: `docs/validation_run.md`.
