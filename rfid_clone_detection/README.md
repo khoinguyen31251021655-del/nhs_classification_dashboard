@@ -137,6 +137,21 @@ nhiều seed cho bước split (không chỉ cho RF/SVM) cũng nên làm nếu n
 báo cáo độ nhạy của kết quả với cách chia (tham số `--seed` của
 `split_leakage_safe.py`).
 
+## 4b. 4.5 — Feature Importance and Security Interpretation
+
+`scripts/feature_importance.py` train lại RF trên đúng split leakage-safe
+(3.5), rồi báo 3 phương pháp bổ trợ nhau (impurity, permutation trên test,
+SHAP + chiều tác động) — không chỉ 1 con số impurity dễ gây hiểu lầm khi đặc
+trưng tương quan cao. Nội dung viết sẵn cho 4.5 (bảng, diễn giải bảo mật,
+và một phát hiện quan trọng: permutation importance ≈ 0 dù model hoàn hảo,
+do đa cộng tuyến giữa các đặc trưng "mật độ đọc"): `docs/4_5_feature_importance.md`.
+Kết quả mẫu (CSV + chart) đã chạy sẵn: `docs/sample_results_4_5/`.
+
+```bash
+python scripts/feature_importance.py --features features_all.csv --splits splits.csv \
+    --out-dir results_4_5/
+```
+
 ## 5. Điều nhóm KHÔNG nên báo cáo (theo đúng cảnh báo trong file góp ý)
 
 - Không claim "real-time" chỉ vì `inference_ms_per_sample` thấp trên Colab —
@@ -166,12 +181,15 @@ rfid_clone_detection/
 ├── scripts/
 │   ├── build_features.py            # 3.2 QC + 3.3 feature engineering
 │   ├── split_leakage_safe.py        # 3.5 group-aware split + CV folds
-│   └── train_detectors.py           # 3.4 E1/E2/E3 × RF/SVM (PySpark), multi-seed
+│   ├── train_detectors.py           # 3.4 E1/E2/E3 × RF/SVM (PySpark), multi-seed
+│   └── feature_importance.py        # 4.5 impurity + permutation + SHAP, sklearn RF
 └── docs/
     ├── colab_quickstart.md          # copy-paste cell cho Google Colab
     ├── pycharm_local_setup.md       # chạy bằng terminal / PyCharm local
     ├── leakage_evidence.md          # bằng chứng số liệu thật cho 3.5 + insight S2 vs S3
-    └── validation_run.md            # kết quả 1 seed chạy thật + cảnh báo accuracy=1.0
+    ├── validation_run.md            # kết quả 1 seed chạy thật + cảnh báo accuracy=1.0
+    ├── 4_5_feature_importance.md    # nội dung viết sẵn cho 4.5, số liệu thật
+    └── sample_results_4_5/          # CSV + chart mẫu đã chạy sẵn (feature_importance.py)
 ```
 
 Toàn bộ 3 script — kể cả `train_detectors.py` bằng PySpark thật (Spark
