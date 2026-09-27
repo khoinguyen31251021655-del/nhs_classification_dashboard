@@ -1,10 +1,10 @@
 ## 4.5. Feature Importance and Security Interpretation
 
-Ở các mục 4.2 và 4.3, cả ba cấu hình bằng chứng (E1, E2, E3) cùng hai bộ phân loại Random Forest (RF) và SVM đều đạt giá trị 1.000 ở mọi chỉ số đánh giá trên tập kiểm tra độc lập. Khi tất cả các cấu hình cùng đạt ngưỡng trần, phép so sánh ablation không còn đủ độ phân giải để lượng hóa đóng góp riêng của từng nguồn bằng chứng; hiệu số E3 − E2 bằng 0 trong trường hợp này phản ánh sự bão hòa của phép đo hơn là sự vắng mặt của đóng góp. Mục này vì vậy sử dụng phân tích quy kết đặc trưng để xem xét một câu hỏi gắn trực tiếp với RQ1 và RQ2: mô hình dựa vào những thông tin nào khi xếp một định danh vào lớp nhân bản, và các thông tin đó mang ý nghĩa an ninh hay chỉ phản ánh đặc điểm của quá trình xây dựng dữ liệu, hiện tượng được Geirhos và cộng sự (2020) mô tả là học theo lối tắt (shortcut learning).
+Ở các mục 4.2 và 4.3, cả ba cấu hình bằng chứng (E1, E2, E3) cùng hai bộ phân loại Random Forest (RF) và SVM đều đạt giá trị 1.000 ở mọi chỉ số đánh giá trên tập kiểm tra độc lập. Khi tất cả các cấu hình cùng đạt ngưỡng trần, phép so sánh ablation không còn đủ độ phân giải để lượng hóa đóng góp riêng của từng nguồn bằng chứng; hiệu số E3 − E2 bằng 0 trong trường hợp này phản ánh sự bão hòa của phép đo hơn là sự vắng mặt của đóng góp. Mục này vì vậy sử dụng phân tích quy kết đặc trưng để xem xét một câu hỏi gắn trực tiếp với RQ1 và RQ2: mô hình dựa vào những thông tin nào khi xếp một định danh vào lớp nhân bản, và các thông tin đó mang ý nghĩa an ninh hay chỉ phản ánh đặc điểm của quá trình xây dựng dữ liệu, hiện tượng được Geirhos và cộng sự [1] mô tả là học theo lối tắt (shortcut learning).
 
 ### 4.5.1. Phương pháp quy kết
 
-Phân tích được thực hiện trên mô hình RF của cấu hình E3, gồm 13 đặc trưng giao thức và đặc trưng hành vi `read_count`, do đây là cấu hình duy nhất chứa đồng thời cả hai họ bằng chứng. Ba thước đo bổ sung cho nhau được sử dụng. Độ quan trọng dựa trên mức giảm tạp chất Gini (Breiman, 2001) được tính trực tiếp từ mô hình nhưng có xu hướng thiên lệch khi các đặc trưng tương quan với nhau (Strobl và cộng sự, 2007). Độ quan trọng hoán vị (permutation importance) được đo bằng mức giảm F1 trên tập kiểm tra khi xáo trộn từng đặc trưng; thước đo này phản ánh tác động trên dữ liệu chưa thấy, song dễ bị đánh giá thấp khi thông tin của một đặc trưng đã được mang bởi các đặc trưng khác (Hooker và cộng sự, 2021). Giá trị SHAP được ước lượng bằng TreeExplainer (Lundberg và Lee, 2017; Lundberg và cộng sự, 2020), cho phép xem xét cả độ lớn lẫn chiều tác động ở mức từng mẫu. Toàn bộ quy trình được lặp lại với năm hạt giống ngẫu nhiên (42, 7, 123, 2024 và 99), mỗi hạt giống ứng với một phép chia theo nhóm khác nhau, nhằm đánh giá độ ổn định của thứ hạng.
+Phân tích được thực hiện trên mô hình RF của cấu hình E3, gồm 13 đặc trưng giao thức và đặc trưng hành vi `read_count`, do đây là cấu hình duy nhất chứa đồng thời cả hai họ bằng chứng. Ba thước đo bổ sung cho nhau được sử dụng. Độ quan trọng dựa trên mức giảm tạp chất Gini [2] được tính trực tiếp từ mô hình nhưng có xu hướng thiên lệch khi các đặc trưng tương quan với nhau [3]. Độ quan trọng hoán vị (permutation importance) được đo bằng mức giảm F1 trên tập kiểm tra khi xáo trộn từng đặc trưng; thước đo này phản ánh tác động trên dữ liệu chưa thấy, song dễ bị đánh giá thấp khi thông tin của một đặc trưng đã được mang bởi các đặc trưng khác [4]. Giá trị SHAP được ước lượng bằng TreeExplainer [5], [6], cho phép xem xét cả độ lớn lẫn chiều tác động ở mức từng mẫu. Toàn bộ quy trình được lặp lại với năm hạt giống ngẫu nhiên (42, 7, 123, 2024 và 99), mỗi hạt giống ứng với một phép chia theo nhóm khác nhau, nhằm đánh giá độ ổn định của thứ hạng.
 
 Bên cạnh ba thước đo trên, chúng tôi truy xuất nguồn gốc của từng đặc trưng, tức là xem xét cách đặc trưng đó được tính cho mỗi lớp từ các tệp dữ liệu gốc, đồng thời thực hiện một phân tích độ nhạy trong đó các đặc trưng giao thức được dẫn xuất lại từ sự kiện đọc thô của S2 và S3 theo cùng một quy tắc.
 
@@ -44,9 +44,9 @@ Bảng 4.y. Các cơ chế tạo khả năng phân tách và tỷ trọng quy k�
 | Định nghĩa `read_count` | `read_count` | 100–154 | 50–83 | 8.7 |
 | Độ phân giải thời gian | `zero_dt_ratio` | 0.000 | 0.000–0.176 | 0.1 |
 
-Cộng dồn theo cơ chế, toàn bộ tỷ trọng quy kết SHAP của mô hình E3 thuộc về các đặc trưng chịu ảnh hưởng của những khác biệt nêu trên, trong đó cửa sổ ghép cặp chiếm 64.5% và quy ước dấu chiếm 26.6%. Các khác biệt này có thể gắn với quá trình sinh dữ liệu của từng kịch bản. Các phiên S1 được ghi trên phần cứng trong năm ngày, từ ngày 4 đến ngày 9/11/2025. Các phiên S2 nằm trong khoảng 5.6 phút theo đồng hồ hệ thống, mỗi phiên kéo dài khoảng 37 giây. Trong khi đó, toàn bộ 108 phiên S3 nằm trong khoảng 6 giây (10:38:05.6–10:38:11.9 ngày 11/11/2025), mỗi phiên có đúng 300 sự kiện và phần micro-giây của các mốc thời gian chỉ nhận 39 giá trị khác nhau, so với 1 000 giá trị ở S1 và S2. Những đặc điểm này phù hợp với giả thuyết rằng lớp nhân bản được sinh bằng phần mềm, một khả năng đã được nêu trong tài liệu mô tả bộ dữ liệu.
+Cộng dồn theo cơ chế, toàn bộ tỷ trọng quy kết SHAP của mô hình E3 thuộc về các đặc trưng chịu ảnh hưởng của những khác biệt nêu trên, trong đó cửa sổ ghép cặp chiếm 64.5% và quy ước dấu chiếm 26.6%. Các khác biệt này có thể gắn với quá trình sinh dữ liệu của từng kịch bản. Các phiên S1 được ghi trên phần cứng trong năm ngày, từ ngày 4 đến ngày 9/11/2025. Các phiên S2 nằm trong khoảng 5.6 phút theo đồng hồ hệ thống, mỗi phiên kéo dài khoảng 37 giây. Trong khi đó, toàn bộ 108 phiên S3 nằm trong khoảng 6 giây (10:38:05.6–10:38:11.9 ngày 11/11/2025), mỗi phiên có đúng 300 sự kiện và phần micro-giây của các mốc thời gian chỉ nhận 39 giá trị khác nhau, so với 1 000 giá trị ở S1 và S2. Những đặc điểm này phù hợp với giả thuyết rằng lớp nhân bản được sinh bằng phần mềm, một khả năng đã được nêu trong tài liệu mô tả bộ dữ liệu [9].
 
-Kết quả trên cần được đặt trong mối liên hệ với giao thức đánh giá ở mục 3.5. Trong cài đặt ban đầu, nhãn nhóm được trích từ `session_id` theo mẫu "TAG". Do mã phiên của S3 (chẳng hạn `S20251110_S3_P10_run1`) không chứa mẫu này, mỗi phiên S3 bị xem là một nhóm riêng, nên dữ liệu có 120 nhóm thay vì 12. Sau khi ánh xạ các phiên S3 về thẻ vật lý dựa trên kế hoạch thí nghiệm (`s3_plan.csv`), dữ liệu còn 12 nhóm, mỗi nhóm chứa cả hai lớp, và tập kiểm tra gồm 54 mẫu. Với phép chia đã hiệu chỉnh, cả RF và SVM vẫn đạt độ chính xác 1.000 ở cả năm hạt giống. Như vậy, việc mô hình ghi nhớ danh tính thẻ không đủ để giải thích kết quả; khả năng phân tách nhiều khả năng bắt nguồn từ khác biệt trong quá trình xây dựng dữ liệu, một dạng rò rỉ thông tin mà phép chia theo nhóm không kiểm soát được (Kaufman và cộng sự, 2012; Kapoor và Narayanan, 2023).
+Kết quả trên cần được đặt trong mối liên hệ với giao thức đánh giá ở mục 3.5. Trong cài đặt ban đầu, nhãn nhóm được trích từ `session_id` theo mẫu "TAG". Do mã phiên của S3 (chẳng hạn `S20251110_S3_P10_run1`) không chứa mẫu này, mỗi phiên S3 bị xem là một nhóm riêng, nên dữ liệu có 120 nhóm thay vì 12. Sau khi ánh xạ các phiên S3 về thẻ vật lý dựa trên kế hoạch thí nghiệm (`s3_plan.csv`), dữ liệu còn 12 nhóm, mỗi nhóm chứa cả hai lớp, và tập kiểm tra gồm 54 mẫu. Với phép chia đã hiệu chỉnh, cả RF và SVM vẫn đạt độ chính xác 1.000 ở cả năm hạt giống. Như vậy, việc mô hình ghi nhớ danh tính thẻ không đủ để giải thích kết quả; khả năng phân tách nhiều khả năng bắt nguồn từ khác biệt trong quá trình xây dựng dữ liệu, một dạng rò rỉ thông tin mà phép chia theo nhóm không kiểm soát được [7], [8].
 
 ### 4.5.4. Phân tích độ nhạy với quy trình dẫn xuất đồng nhất
 
@@ -96,23 +96,25 @@ Xét theo mô hình đối thủ ở mục 3.1, một bộ phát hiện dựa v�
 
 Những kết quả trên gợi ý một số yêu cầu đối với việc đánh giá bộ phát hiện nhân bản dựa trên học máy. Đặc trưng của mọi lớp cần được dẫn xuất từ sự kiện thô thông qua cùng một quy trình, với cùng quy ước dấu, cửa sổ ghép cặp và độ phân giải thời gian, và kết quả truy xuất nguồn gốc đặc trưng như Bảng 4.y nên được báo cáo cùng kết quả phân loại. Bằng chứng giao thức nên được biểu diễn dưới dạng chuẩn hóa theo tốc độ đọc thay vì thống kê thô của Δ. Dữ liệu cần kèm thông tin bố trí reader để đặc trưng chuyển tiếp bất khả thi có định nghĩa vận hành, và lớp nhân bản cần được thu trên phần cứng hoặc được sinh với nhịp đọc và tỷ lệ đọc hụt tương đương thẻ thật. Các vấn đề này được thảo luận thêm ở mục 5.3 và 5.4.
 
-### Tài liệu tham khảo (cho mục 4.5)
+### References
 
-Breiman, L. (2001). Random forests. *Machine Learning*, 45(1), 5–32.
+[1] R. Geirhos, J.-H. Jacobsen, C. Michaelis, R. Zemel, W. Brendel, M. Bethge, and F. A. Wichmann, "Shortcut learning in deep neural networks," *Nature Machine Intelligence*, vol. 2, no. 11, pp. 665–673, 2020.
 
-Geirhos, R., Jacobsen, J.-H., Michaelis, C., Zemel, R., Brendel, W., Bethge, M., & Wichmann, F. A. (2020). Shortcut learning in deep neural networks. *Nature Machine Intelligence*, 2(11), 665–673.
+[2] L. Breiman, "Random forests," *Machine Learning*, vol. 45, no. 1, pp. 5–32, 2001.
 
-Hooker, G., Mentch, L., & Zhou, S. (2021). Unrestricted permutation forces extrapolation: Variable importance requires at least one more model, or there is no free variable importance. *Statistics and Computing*, 31(6), 82.
+[3] C. Strobl, A.-L. Boulesteix, A. Zeileis, and T. Hothorn, "Bias in random forest variable importance measures: Illustrations, sources and a solution," *BMC Bioinformatics*, vol. 8, Art. no. 25, 2007.
 
-Kapoor, S., & Narayanan, A. (2023). Leakage and the reproducibility crisis in machine-learning-based science. *Patterns*, 4(9), 100804.
+[4] G. Hooker, L. Mentch, and S. Zhou, "Unrestricted permutation forces extrapolation: Variable importance requires at least one more model, or there is no free variable importance," *Statistics and Computing*, vol. 31, no. 6, Art. no. 82, 2021.
 
-Kaufman, S., Rosset, S., Perlich, C., & Stitelman, O. (2012). Leakage in data mining: Formulation, detection, and avoidance. *ACM Transactions on Knowledge Discovery from Data*, 6(4), Article 15.
+[5] S. M. Lundberg and S.-I. Lee, "A unified approach to interpreting model predictions," in *Advances in Neural Information Processing Systems 30 (NIPS 2017)*, 2017, pp. 4765–4774.
 
-Lundberg, S. M., & Lee, S.-I. (2017). A unified approach to interpreting model predictions. *Advances in Neural Information Processing Systems*, 30.
+[6] S. M. Lundberg, G. Erion, H. Chen, A. DeGrave, J. M. Prutkin, B. Nair, R. Katz, J. Himmelfarb, N. Bansal, and S.-I. Lee, "From local explanations to global understanding with explainable AI for trees," *Nature Machine Intelligence*, vol. 2, no. 1, pp. 56–67, 2020.
 
-Lundberg, S. M., Erion, G., Chen, H., DeGrave, A., Prutkin, J. M., Nair, B., Katz, R., Himmelfarb, J., Bansal, N., & Lee, S.-I. (2020). From local explanations to global understanding with explainable AI for trees. *Nature Machine Intelligence*, 2(1), 56–67.
+[7] S. Kaufman, S. Rosset, C. Perlich, and O. Stitelman, "Leakage in data mining: Formulation, detection, and avoidance," *ACM Transactions on Knowledge Discovery from Data*, vol. 6, no. 4, Art. no. 15, 2012.
 
-Strobl, C., Boulesteix, A.-L., Zeileis, A., & Hothorn, T. (2007). Bias in random forest variable importance measures: Illustrations, sources and a solution. *BMC Bioinformatics*, 8, 25.
+[8] S. Kapoor and A. Narayanan, "Leakage and the reproducibility crisis in machine-learning-based science," *Patterns*, vol. 4, no. 9, Art. no. 100804, 2023.
+
+[9] RFID-ExSim Dataset, "Experiment Scenarios (S1–S5)," dataset documentation, `docs/scenarios.md`.
 
 ---
 
