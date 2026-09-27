@@ -188,7 +188,8 @@ rfid_clone_detection/
     ├── leakage_evidence.md          # bằng chứng số liệu thật cho 3.5 + insight S2 vs S3
     ├── validation_run.md            # kết quả 1 seed chạy thật + cảnh báo accuracy=1.0
     ├── 4_5_feature_importance.md    # mục 4.5 bản rút gọn (~1 trang) cho bài 12 trang
-    └── 4_5_feature_importance_full.md # bản đầy đủ, dùng cho phụ lục / phản biện
+    ├── 4_5_feature_importance_full.md # bản đầy đủ, dùng cho phụ lục / phản biện
+    └── 4_6_rq3_cost.md              # mục 4.6 (RQ3), số liệu từ analysis_4_5/rq3_cost_benchmark.py
 analysis_4_5/                        # tái lập notebook nhóm + kiểm toán nguồn gốc + tái dẫn xuất đồng nhất
 ```
 
