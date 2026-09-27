@@ -65,42 +65,43 @@ def session_features(g):
     return out
 
 
-rows = []
-for s, label in [("S2", 0), ("S3", 1)]:
-    df = load(s)
-    for sid, g in df.groupby("session_id"):
-        r = session_features(g)
-        r.update(session_id=sid, scenario=s, label=label, tag=tag_of(sid))
-        rows.append(r)
-H = pd.DataFrame(rows)
-H.to_csv("harmonised_S2_S3.csv", index=False)
-lam = H.reads_per_reader / H.duration_s
-H["sync_over_chance"] = H.sync_rate_5ms / H.chance_rate_5ms
-H["nn_ratio_to_chance"] = H.nn_abs_delta_median_ms / (np.log(2) / (2 * lam) * 1000)
-print(H.groupby("scenario")[["read_rate_hz", "sync_rate_5ms", "chance_rate_5ms", "sync_over_chance", "nn_abs_delta_median_ms", "nn_ratio_to_chance"]].median().round(3).T)
+if __name__ == "__main__":
+    rows = []
+    for s, label in [("S2", 0), ("S3", 1)]:
+        df = load(s)
+        for sid, g in df.groupby("session_id"):
+            r = session_features(g)
+            r.update(session_id=sid, scenario=s, label=label, tag=tag_of(sid))
+            rows.append(r)
+    H = pd.DataFrame(rows)
+    H.to_csv("harmonised_S2_S3.csv", index=False)
+    lam = H.reads_per_reader / H.duration_s
+    H["sync_over_chance"] = H.sync_rate_5ms / H.chance_rate_5ms
+    H["nn_ratio_to_chance"] = H.nn_abs_delta_median_ms / (np.log(2) / (2 * lam) * 1000)
+    print(H.groupby("scenario")[["read_rate_hz", "sync_rate_5ms", "chance_rate_5ms", "sync_over_chance", "nn_abs_delta_median_ms", "nn_ratio_to_chance"]].median().round(3).T)
 
-FEATS = ["negative_share_in_window", "zero_share_in_window", "reads_per_reader",
-         "nn_abs_delta_median_ms", "sync_rate_5ms", "excess_sync_log", "read_rate_hz", "duration_s"]
-print("groups (tags) per class:", H.groupby("label").tag.nunique().to_dict())
-res = []
-for c in FEATS:
-    x = H[c].fillna(H[c].median())
-    auc = roc_auc_score(H.label, x)
-    res.append(dict(feature=c, real_S2_median=H.loc[H.label == 0, c].median(),
-                    clone_S3_median=H.loc[H.label == 1, c].median(), single_AUC=max(auc, 1 - auc)))
-pd.set_option("display.width", 200)
-print(pd.DataFrame(res).round(4).to_string(index=False))
+    FEATS = ["negative_share_in_window", "zero_share_in_window", "reads_per_reader",
+             "nn_abs_delta_median_ms", "sync_rate_5ms", "excess_sync_log", "read_rate_hz", "duration_s"]
+    print("groups (tags) per class:", H.groupby("label").tag.nunique().to_dict())
+    res = []
+    for c in FEATS:
+        x = H[c].fillna(H[c].median())
+        auc = roc_auc_score(H.label, x)
+        res.append(dict(feature=c, real_S2_median=H.loc[H.label == 0, c].median(),
+                        clone_S3_median=H.loc[H.label == 1, c].median(), single_AUC=max(auc, 1 - auc)))
+    pd.set_option("display.width", 200)
+    print(pd.DataFrame(res).round(4).to_string(index=False))
 
-# tag-grouped RF on the provenance-robust subset only (drops rate/duration/resolution cues)
-ROBUST = ["negative_share_in_window", "nn_abs_delta_median_ms", "excess_sync_log", "reads_per_reader"]
-X, y, g = H[ROBUST].fillna(0), H.label, H.tag
-rf = RandomForestClassifier(n_estimators=300, random_state=42, class_weight="balanced")
-pred = cross_val_predict(rf, X, y, groups=g, cv=GroupKFold(6))
-print("\nleave-tags-out RF on robust subset: acc", round((pred == y).mean(), 4))
-rf.fit(X, y)
-sv = shap.TreeExplainer(rf).shap_values(X)
-sv = sv[:, :, 1] if sv.ndim == 3 else sv
-imp = pd.DataFrame({"impurity": rf.feature_importances_, "mean_abs_shap": np.abs(sv).mean(0),
-                    "direction_corr": [np.corrcoef(X[c], sv[:, i])[0, 1] if X[c].std() > 0 else np.nan
-                                       for i, c in enumerate(ROBUST)]}, index=ROBUST)
-print(imp.sort_values("mean_abs_shap", ascending=False).round(4).to_string())
+    # tag-grouped RF on the provenance-robust subset only (drops rate/duration/resolution cues)
+    ROBUST = ["negative_share_in_window", "nn_abs_delta_median_ms", "excess_sync_log", "reads_per_reader"]
+    X, y, g = H[ROBUST].fillna(0), H.label, H.tag
+    rf = RandomForestClassifier(n_estimators=300, random_state=42, class_weight="balanced")
+    pred = cross_val_predict(rf, X, y, groups=g, cv=GroupKFold(6))
+    print("\nleave-tags-out RF on robust subset: acc", round((pred == y).mean(), 4))
+    rf.fit(X, y)
+    sv = shap.TreeExplainer(rf).shap_values(X)
+    sv = sv[:, :, 1] if sv.ndim == 3 else sv
+    imp = pd.DataFrame({"impurity": rf.feature_importances_, "mean_abs_shap": np.abs(sv).mean(0),
+                        "direction_corr": [np.corrcoef(X[c], sv[:, i])[0, 1] if X[c].std() > 0 else np.nan
+                                           for i, c in enumerate(ROBUST)]}, index=ROBUST)
+    print(imp.sort_values("mean_abs_shap", ascending=False).round(4).to_string())
