@@ -187,7 +187,8 @@ rfid_clone_detection/
     ├── pycharm_local_setup.md       # chạy bằng terminal / PyCharm local
     ├── leakage_evidence.md          # bằng chứng số liệu thật cho 3.5 + insight S2 vs S3
     ├── validation_run.md            # kết quả 1 seed chạy thật + cảnh báo accuracy=1.0
-    └── 4_5_feature_importance.md    # mục 4.5 viết sẵn, dựa trên notebook của nhóm
+    ├── 4_5_feature_importance.md    # mục 4.5 bản rút gọn (~1 trang) cho bài 12 trang
+    └── 4_5_feature_importance_full.md # bản đầy đủ, dùng cho phụ lục / phản biện
 analysis_4_5/                        # tái lập notebook nhóm + kiểm toán nguồn gốc + tái dẫn xuất đồng nhất
 ```
 

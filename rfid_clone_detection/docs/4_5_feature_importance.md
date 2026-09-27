@@ -1,127 +1,38 @@
 ## 4.5. Feature Importance and Security Interpretation
 
-Ở các mục 4.2 và 4.3, cả ba cấu hình bằng chứng (E1, E2, E3) cùng hai bộ phân loại Random Forest (RF) và SVM đều đạt giá trị 1.000 ở mọi chỉ số đánh giá trên tập kiểm tra độc lập. Khi tất cả các cấu hình cùng đạt ngưỡng trần, phép so sánh ablation không còn đủ độ phân giải để lượng hóa đóng góp riêng của từng nguồn bằng chứng; hiệu số E3 − E2 bằng 0 trong trường hợp này phản ánh sự bão hòa của phép đo hơn là sự vắng mặt của đóng góp. Mục này vì vậy sử dụng phân tích quy kết đặc trưng để xem xét một câu hỏi gắn trực tiếp với RQ1 và RQ2: mô hình dựa vào những thông tin nào khi xếp một định danh vào lớp nhân bản, và các thông tin đó mang ý nghĩa an ninh hay chỉ phản ánh đặc điểm của quá trình xây dựng dữ liệu, hiện tượng được Geirhos và cộng sự [1] mô tả là học theo lối tắt (shortcut learning).
+Do cả ba cấu hình E1, E2, E3 và hai bộ phân loại đều đạt 1.000 ở mọi chỉ số (mục 4.3), phép so sánh ablation không lượng hóa được đóng góp của từng nguồn bằng chứng. Chúng tôi vì vậy phân tích quy kết đặc trưng để xác định mô hình dựa vào bằng chứng an ninh hay vào lối tắt phát sinh từ dữ liệu (shortcut learning) [1]. Mô hình RF của E3 được phân tích bằng ba thước đo trên năm hạt giống: độ quan trọng Gini, vốn thiên lệch khi các đặc trưng tương quan [2]; độ quan trọng hoán vị trên tập kiểm tra [3]; và giá trị SHAP ước lượng bằng TreeExplainer [4]. Kết quả quy kết được đối chiếu với nguồn gốc của từng đặc trưng và với một phân tích độ nhạy, trong đó đặc trưng giao thức của S2 và S3 được dẫn xuất lại từ sự kiện đọc thô theo cùng một quy tắc: cùng quy ước dấu Δ = t_B − t_A, cùng lưới thời gian 1 ms, cùng cửa sổ đồng hiện diện w = 5 ms, và chuẩn hóa theo xác suất trùng hợp ngẫu nhiên p₀ = 1 − exp(−2wλ_B) của hai reader đọc độc lập với tốc độ λ_B.
 
-### 4.5.1. Phương pháp quy kết
+Độ quan trọng phân bố gần như đều trên 11 đặc trưng (Gini từ 0.077 đến 0.097), thứ hạng dao động mạnh giữa các hạt giống (chẳng hạn `dt_std` xếp từ thứ nhất đến thứ mười một), và độ quan trọng hoán vị bằng 0 với cả 14 đặc trưng. Nguyên nhân là 11 trong 14 đặc trưng tự phân tách hoàn toàn hai lớp (AUC đơn biến bằng 1.000): khi nhiều đặc trưng dư thừa cùng đủ để phân loại, mô hình chọn giữa chúng một cách ngẫu nhiên và nhiễu ở một đặc trưng được các đặc trưng còn lại bù đắp. Thứ hạng quy kết do đó không đủ để xác định bằng chứng mà mô hình sử dụng; điều cần xem xét là nguồn gốc của khả năng phân tách (Bảng 4.x).
 
-Phân tích được thực hiện trên mô hình RF của cấu hình E3, gồm 13 đặc trưng giao thức và đặc trưng hành vi `read_count`, do đây là cấu hình duy nhất chứa đồng thời cả hai họ bằng chứng. Ba thước đo bổ sung cho nhau được sử dụng. Độ quan trọng dựa trên mức giảm tạp chất Gini [2] được tính trực tiếp từ mô hình nhưng có xu hướng thiên lệch khi các đặc trưng tương quan với nhau [3]. Độ quan trọng hoán vị (permutation importance) được đo bằng mức giảm F1 trên tập kiểm tra khi xáo trộn từng đặc trưng; thước đo này phản ánh tác động trên dữ liệu chưa thấy, song dễ bị đánh giá thấp khi thông tin của một đặc trưng đã được mang bởi các đặc trưng khác [4]. Giá trị SHAP được ước lượng bằng TreeExplainer [5], [6], cho phép xem xét cả độ lớn lẫn chiều tác động ở mức từng mẫu. Toàn bộ quy trình được lặp lại với năm hạt giống ngẫu nhiên (42, 7, 123, 2024 và 99), mỗi hạt giống ứng với một phép chia theo nhóm khác nhau, nhằm đánh giá độ ổn định của thứ hạng.
+Bảng 4.x. Nguồn gốc khả năng phân tách của các đặc trưng E3 và kết quả sau khi dẫn xuất đồng nhất
 
-Bên cạnh ba thước đo trên, chúng tôi truy xuất nguồn gốc của từng đặc trưng, tức là xem xét cách đặc trưng đó được tính cho mỗi lớp từ các tệp dữ liệu gốc, đồng thời thực hiện một phân tích độ nhạy trong đó các đặc trưng giao thức được dẫn xuất lại từ sự kiện đọc thô của S2 và S3 theo cùng một quy tắc.
-
-### 4.5.2. Kết quả quy kết
-
-Bảng 4.x. Độ quan trọng đặc trưng của mô hình RF trong cấu hình E3 (trung bình ± độ lệch chuẩn trên năm hạt giống)
-
-| Đặc trưng | Gini | \|SHAP\| trung bình | Khoảng thứ hạng SHAP | Mức giảm F1 khi hoán vị | AUC đơn biến |
-|---|---|---|---|---|---|
-| `dt_abs_mean` | 0.097 ± 0.013 | 0.048 ± 0.006 | 1–10 | 0.000 | 1.000 |
-| `dt_max` | 0.096 ± 0.013 | 0.048 ± 0.006 | 1–9 | 0.000 | 1.000 |
-| `positive_dt_ratio` | 0.095 ± 0.008 | 0.048 ± 0.004 | 2–8 | 0.000 | 1.000 |
-| `small_dt_50ms_ratio` | 0.095 ± 0.008 | 0.048 ± 0.004 | 2–7 | 0.000 | 1.000 |
-| `dt_abs_median` | 0.095 ± 0.007 | 0.047 ± 0.004 | 1–7 | 0.000 | 1.000 |
-| `dt_std` | 0.094 ± 0.017 | 0.047 ± 0.009 | 1–11 | 0.000 | 1.000 |
-| `collision_count` | 0.091 ± 0.013 | 0.046 ± 0.006 | 3–11 | 0.000 | 1.000 |
-| `read_count` | 0.087 ± 0.017 | 0.044 ± 0.009 | 2–11 | 0.000 | 1.000 |
-| `negative_dt_ratio` | 0.084 ± 0.006 | 0.042 ± 0.003 | 5–10 | 0.000 | 1.000 |
-| `dt_min` | 0.081 ± 0.012 | 0.041 ± 0.006 | 3–10 | 0.000 | 1.000 |
-| `small_dt_10ms_ratio` | 0.077 ± 0.009 | 0.039 ± 0.004 | 7–11 | 0.000 | 1.000 |
-| `dt_median` | 0.004 ± 0.006 | 0.002 ± 0.003 | 12–14 | 0.000 | 0.973 |
-| `dt_mean` | 0.001 ± 0.003 | 0.001 ± 0.001 | 12–14 | 0.000 | 0.910 |
-| `zero_dt_ratio` | 0.001 ± 0.001 | 0.001 ± 0.001 | 12–14 | 0.000 | 0.944 |
-
-Độ quan trọng phân bố tương đối đồng đều trên 11 đặc trưng đầu, với giá trị Gini nằm trong khoảng 0.077–0.097, và thứ hạng của từng đặc trưng thay đổi đáng kể giữa các lần chạy; `dt_std`, `collision_count` và `read_count` chẳng hạn có thể xếp thứ nhất hoặc thứ hai ở lần chạy này nhưng thứ mười một ở lần chạy khác. Mức giảm F1 khi hoán vị bằng 0 với cả 14 đặc trưng, dù mô hình phân loại đúng toàn bộ tập kiểm tra. Các hiện tượng này nhất quán với việc 11 trong 14 đặc trưng có khả năng tự phân tách hoàn toàn hai lớp: miền giá trị của lớp thật và lớp nhân bản không giao nhau, và AUC đơn biến tương ứng bằng 1.000. Khi có nhiều đặc trưng dư thừa mà mỗi đặc trưng đều đủ để phân loại, việc lựa chọn giữa chúng tại các nút của cây mang tính ngẫu nhiên, và nhiễu đưa vào một đặc trưng được bù đắp bởi các đặc trưng còn lại. Thứ hạng trong Bảng 4.x do đó cho biết tồn tại nhiều cách tương đương để tách hai lớp, nhưng không chỉ ra được nguồn bằng chứng mà mô hình thực sự phụ thuộc vào. Việc lý giải khả năng phân tách này đòi hỏi xem xét cách các đặc trưng được xây dựng.
-
-### 4.5.3. Nguồn gốc của khả năng phân tách
-
-Việc truy xuất nguồn gốc cho thấy khả năng phân tách xuất phát từ bốn khác biệt trong cách dữ liệu của hai lớp được tóm tắt (Bảng 4.y). Khác biệt đầu tiên nằm ở quy ước dấu: tệp tóm tắt của S2 lưu hiệu thời gian có dấu Δ = t_B − t_A, trong khi tệp của S3 lưu giá trị tuyệt đối |t_B − t_A|. Hệ quả là tỷ lệ Δ âm xấp xỉ 0.50 ở lớp thật và bằng 0 ở lớp nhân bản. Khi hiệu có dấu được tính lại từ chính các mốc thời gian trong tệp S3, tỷ lệ giá trị âm là 44.7%, gần với mức của S2. Đặc trưng `negative_dt_ratio`, cũng là đặc trưng được bộ phát hiện E1 lựa chọn với ngưỡng 0.25, vì thế phản ánh quy ước lưu trữ chứ không phản ánh thuộc tính của thẻ nhân bản. Khác biệt thứ hai liên quan đến cửa sổ ghép cặp: tệp S3 chỉ chứa các cặp đọc chéo có |Δ| ≤ 5 ms, còn tệp S2 ghép các cặp cách nhau tới 760 ms. Các đặc trưng mô tả độ lớn và độ phân tán của Δ, cùng với số cặp va chạm, do đó khác nhau theo cấu trúc; `small_dt_10ms_ratio` của S3 bằng 1.000 ở mọi phiên, trong khi dữ liệu thô của S2 vẫn có 4.8% cặp đọc chéo nằm trong khoảng 5 ms. Khác biệt thứ ba là định nghĩa của `read_count`. Ở lớp thật, đây là tổng số lượt đọc của một phiên S1, vốn được ấn định bởi kế hoạch thí nghiệm (100 hoặc 150 lượt); ở lớp nhân bản, đây là số cặp đọc trùng trong tệp S3 (50–83 cặp). Khác biệt cuối cùng là độ phân giải thời gian: 93.8% giá trị Δ của S3 nằm trên lưới mili-giây nguyên, trong khi Δ của S2 có độ phân giải micro-giây, dẫn đến chênh lệch ở tỷ lệ Δ bằng 0.
-
-Bảng 4.y. Các cơ chế tạo khả năng phân tách và tỷ trọng quy kết SHAP tương ứng
-
-| Cơ chế | Đặc trưng liên quan | Lớp thật | Lớp nhân bản | Tỷ trọng \|SHAP\| (%) |
+| Cơ chế | Đặc trưng E3 chịu ảnh hưởng | Tỷ trọng \|SHAP\| | Chỉ số sau dẫn xuất đồng nhất (thật / nhân bản) | AUC trước → sau |
 |---|---|---|---|---|
-| Quy ước dấu (S2 lưu Δ có dấu, S3 lưu \|Δ\|) | `negative_dt_ratio`, `positive_dt_ratio`, `dt_min`, `dt_mean`, `dt_median` | `negative_dt_ratio` ≈ 0.50 | `negative_dt_ratio` = 0.00 | 26.6 |
-| Cửa sổ ghép cặp (S3: ≤ 5 ms; S2: ≤ 760 ms) | `dt_std`, `dt_max`, `dt_abs_mean`, `dt_abs_median`, `small_dt_10ms_ratio`, `small_dt_50ms_ratio`, `collision_count` | `dt_max`: 0.33–0.76 s; ~293 cặp/phiên | `dt_max` = 0.005 s; 50–83 cặp/phiên | 64.5 |
-| Định nghĩa `read_count` | `read_count` | 100–154 | 50–83 | 8.7 |
-| Độ phân giải thời gian | `zero_dt_ratio` | 0.000 | 0.000–0.176 | 0.1 |
+| Quy ước dấu (S2 lưu Δ có dấu, S3 lưu \|Δ\|) | `negative_dt_ratio`, `positive_dt_ratio`, `dt_min`, `dt_mean`, `dt_median` | 26.6% | Tỷ lệ Δ âm: 0.458 / 0.433 | 1.000 → 0.546 |
+| Cửa sổ ghép cặp (S3 ≤ 5 ms, S2 ≤ 760 ms) | `dt_std`, `dt_max`, `dt_abs_mean`, `dt_abs_median`, `small_dt_*_ratio`, `collision_count` | 64.5% | Đồng hiện diện so với p₀: 2.69 / 2.01 | 1.000 → 0.834ᵃ |
+| Định nghĩa `read_count` khác nhau giữa hai lớp | `read_count` | 8.7% | Lượt đọc mỗi reader: 147.25 / 150.00 | 1.000 → 1.000ᵇ |
+| Độ phân giải thời gian (S3 trên lưới mili-giây) | `zero_dt_ratio` | 0.1% | Tỷ lệ Δ = 0: 0.083 / 0.107 | 0.944 → 0.602 |
 
-Cộng dồn theo cơ chế, toàn bộ tỷ trọng quy kết SHAP của mô hình E3 thuộc về các đặc trưng chịu ảnh hưởng của những khác biệt nêu trên, trong đó cửa sổ ghép cặp chiếm 64.5% và quy ước dấu chiếm 26.6%. Các khác biệt này có thể gắn với quá trình sinh dữ liệu của từng kịch bản. Các phiên S1 được ghi trên phần cứng trong năm ngày, từ ngày 4 đến ngày 9/11/2025. Các phiên S2 nằm trong khoảng 5.6 phút theo đồng hồ hệ thống, mỗi phiên kéo dài khoảng 37 giây. Trong khi đó, toàn bộ 108 phiên S3 nằm trong khoảng 6 giây (10:38:05.6–10:38:11.9 ngày 11/11/2025), mỗi phiên có đúng 300 sự kiện và phần micro-giây của các mốc thời gian chỉ nhận 39 giá trị khác nhau, so với 1 000 giá trị ở S1 và S2. Những đặc điểm này phù hợp với giả thuyết rằng lớp nhân bản được sinh bằng phần mềm, một khả năng đã được nêu trong tài liệu mô tả bộ dữ liệu [7].
+ᵃ Giá trị cao hơn ở lớp thật. ᵇ Lớp nhân bản không có lượt đọc hụt.
 
-Kết quả trên cần được đặt trong mối liên hệ với giao thức đánh giá ở mục 3.5. Trong cài đặt ban đầu, nhãn nhóm được trích từ `session_id` theo mẫu "TAG". Do mã phiên của S3 (chẳng hạn `S20251110_S3_P10_run1`) không chứa mẫu này, mỗi phiên S3 bị xem là một nhóm riêng, nên dữ liệu có 120 nhóm thay vì 12. Sau khi ánh xạ các phiên S3 về thẻ vật lý dựa trên kế hoạch thí nghiệm (`s3_plan.csv`), dữ liệu còn 12 nhóm, mỗi nhóm chứa cả hai lớp, và tập kiểm tra gồm 54 mẫu. Với phép chia đã hiệu chỉnh, cả RF và SVM vẫn đạt độ chính xác 1.000 ở cả năm hạt giống. Như vậy, việc mô hình ghi nhớ danh tính thẻ không đủ để giải thích kết quả; khả năng phân tách nhiều khả năng bắt nguồn từ khác biệt trong quá trình xây dựng dữ liệu, một dạng rò rỉ thông tin mà phép chia theo nhóm không kiểm soát được [8], [9].
+Toàn bộ tỷ trọng SHAP rơi vào các đặc trưng chịu ảnh hưởng của những khác biệt trong cách tóm tắt dữ liệu hai lớp. Tệp S3 lưu |t_B − t_A| trong khi tệp S2 lưu hiệu có dấu, nên `negative_dt_ratio`, cũng là đặc trưng mà bộ phát hiện E1 lựa chọn, bằng 0 ở lớp nhân bản; khi tính lại hiệu có dấu từ các mốc thời gian của S3, tỷ lệ giá trị âm là 44.7%, tương đương S2. Tệp S3 chỉ giữ các cặp đọc có |Δ| ≤ 5 ms, trong khi S2 ghép cặp đến 760 ms, còn `read_count` là tổng lượt đọc theo kế hoạch thí nghiệm (100 hoặc 150) ở lớp thật nhưng là số cặp đọc trùng (50–83) ở lớp nhân bản. Sau khi dẫn xuất đồng nhất, tần suất đồng hiện diện thô vẫn cao hơn ở lớp nhân bản (0.447 so với 0.103), song tốc độ đọc của S3 cao gấp 6.4 lần S2 (50.3 so với 7.9 Hz), và khi chuẩn hóa theo p₀ thì lớp thật lại đồng bộ vượt mức ngẫu nhiên nhiều hơn (2.69 so với 2.01 lần). Các đặc trưng còn tách hoàn toàn hai lớp chỉ gồm tốc độ đọc, thời lượng phiên và mức đầy đủ của luồng đọc. Điều này phù hợp với việc toàn bộ 108 phiên S3 nằm trong khoảng 6 giây, mỗi phiên đúng 300 sự kiện, tức lớp nhân bản nhiều khả năng được sinh bằng phần mềm như tài liệu bộ dữ liệu đã đề cập [5]. Khi ánh xạ lại các phiên S3 về 12 thẻ vật lý, thay cho 108 nhóm phát sinh do không trích được tên thẻ từ `session_id`, RF và SVM vẫn đạt 1.000 trên cả năm hạt giống. Kết quả vì thế không đến từ việc ghi nhớ danh tính thẻ mà từ rò rỉ trong quá trình xây dựng dữ liệu [6].
 
-### 4.5.4. Phân tích độ nhạy với quy trình dẫn xuất đồng nhất
-
-Để tách tín hiệu có ý nghĩa an ninh khỏi ảnh hưởng của khâu tiền xử lý, các đặc trưng giao thức được tính lại từ sự kiện đọc thô của S2 và S3 theo cùng một quy tắc. Với mỗi lượt đọc của reader A, lượt đọc gần nhất của reader B được xác định và hiệu có dấu Δ = t_B − t_A được tính; cả hai lớp được đưa về cùng lưới thời gian 1 ms và sử dụng chung cửa sổ đồng hiện diện w = 5 ms. Chúng tôi bổ sung một đại lượng chuẩn hóa theo tốc độ đọc. Nếu hai reader đọc độc lập theo quá trình Poisson, xác suất để một lượt đọc của A có lượt đọc của B trong cửa sổ w là p₀ = 1 − exp(−2wλ_B), với λ_B là tốc độ đọc của reader B. Tỷ số giữa tần suất đồng hiện diện quan sát được và p₀ biểu thị mức đồng bộ vượt quá mức ngẫu nhiên.
-
-Bảng 4.z. Đặc trưng sau khi dẫn xuất đồng nhất (trung vị theo phiên)
-
-| Đặc trưng | Lớp thật (S2) | Lớp nhân bản (S3) | AUC đơn biến |
-|---|---|---|---|
-| Tỷ lệ Δ âm trong cửa sổ | 0.458 | 0.433 | 0.546 |
-| Tỷ lệ Δ = 0 | 0.083 | 0.107 | 0.602 |
-| Tần suất đồng hiện diện (≤ 5 ms) | 0.103 | 0.447 | 1.000 |
-| Trung vị \|Δ\| giữa hai reader (ms) | 31 | 6 | 1.000 |
-| Tốc độ đọc (Hz) | 7.9 | 50.3 | 1.000 |
-| Xác suất trùng hợp ngẫu nhiên p₀ | 0.039 | 0.222 | – |
-| Tỷ số đồng hiện diện so với p₀ | 2.69 | 2.01 | 0.834ᵃ |
-| Tỷ số \|Δ\| quan sát so với \|Δ\| kỳ vọng | 0.36 | 0.44 | – |
-| Số lượt đọc mỗi reader | 147.25 | 150.00 | 1.000 |
-
-ᵃ Giá trị cao hơn ở lớp thật.
-
-Khi hai lớp được xử lý theo cùng một quy tắc, các đặc trưng liên quan đến dấu và độ phân giải gần như mất khả năng phân tách: AUC của tỷ lệ Δ âm giảm từ 1.000 xuống 0.546, và của tỷ lệ Δ bằng 0 giảm xuống 0.602. Theo đó, bộ phát hiện E1 sẽ hoạt động gần với mức ngẫu nhiên nếu dữ liệu hai lớp được tiền xử lý thống nhất.
-
-Tần suất đồng hiện diện và khoảng cách thời gian giữa hai reader vẫn phân tách được hai lớp ở dạng thô. Định danh nhân bản xuất hiện đồng thời ở hai reader trong 44.7% lượt đọc, so với 10.3% ở lớp thật, với trung vị |Δ| lần lượt là 6 ms và 31 ms. Tuy vậy, tốc độ đọc trong S3 cao gấp khoảng 6.4 lần S2 (50.3 Hz so với 7.9 Hz), nên xác suất hai lượt đọc độc lập rơi vào cùng một cửa sổ 5 ms cũng cao hơn khoảng 5.7 lần (0.222 so với 0.039). Sau khi chuẩn hóa theo mức ngẫu nhiên, cả hai lớp đều thể hiện mức đồng bộ vượt ngẫu nhiên, nhưng mức vượt ở lớp thật (2.69 lần) cao hơn ở lớp nhân bản (2.01 lần), và tỷ số giữa |Δ| quan sát và |Δ| kỳ vọng cũng thấp hơn ở lớp thật (0.36 so với 0.44). Điều này phù hợp với điều kiện vật lý của S2, trong đó hai reader cùng đọc một thẻ thật nằm trong vùng phủ sóng chồng lấn.
-
-Các đặc trưng còn giữ AUC bằng 1.000 sau khi dẫn xuất đồng nhất gồm tốc độ đọc, thời lượng phiên và số lượt đọc mỗi reader; ở chỉ số cuối, S3 luôn đạt đủ 150 lượt, trong khi S2 có lượt đọc hụt. Khi chỉ sử dụng các đặc trưng đã dẫn xuất đồng nhất và đánh giá bằng kiểm định chéo sáu phần theo nhóm thẻ, RF vẫn đạt độ chính xác 1.000, với độ quan trọng tập trung vào trung vị |Δ| (0.48) và số lượt đọc mỗi reader (0.41). Cả hai đại lượng này đều phụ thuộc trực tiếp vào nhịp đọc của từng kịch bản.
-
-### 4.5.5. Diễn giải dưới góc độ an ninh
-
-Bảng 4.w. Đối chiếu các bằng chứng an ninh giả thuyết với kết quả trên RFID-ExSim
-
-| Bằng chứng giả thuyết (mục 3.3) | Chiều kỳ vọng | Kết quả quan sát |
-|---|---|---|
-| Số reader cùng đọc một UID | Tăng → rủi ro nhân bản tăng | Xuất hiện ở cả hai lớp, do S2 gồm hai reader đọc hợp lệ cùng một thẻ |
-| Khoảng cách thời gian giữa hai reader | Gần 0 → rủi ro nhân bản tăng | Đúng chiều ở dạng thô; đảo chiều sau khi chuẩn hóa theo tốc độ đọc |
-| Chuyển tiếp reader bất khả thi | Tăng → rủi ro nhân bản tăng | Không xác định được do thiếu thông tin vị trí reader; vùng phủ của hai reader chồng lấn |
-| Mức đầy đủ của luồng đọc | Quá đều đặn → nghi ngờ dữ liệu bị chèn | S3 không có lượt đọc hụt; không tách được khỏi đặc tính của quá trình mô phỏng |
-| Dấu và phân phối của Δ (E1) | – | Phát sinh từ quy ước lưu trữ |
-
-Đối chiếu với các giả thuyết ở mục 3.3 (Bảng 4.w) cho thấy, trên RFID-ExSim và với quy trình xây dựng đặc trưng hiện tại, các bộ phát hiện chưa sử dụng bằng chứng an ninh theo nghĩa mà thiết kế nghiên cứu hướng tới. Khả năng phân loại của chúng chủ yếu dựa trên khác biệt trong cách từng lớp được ghi nhận, tóm tắt và sinh ra.
-
-Kết quả này góp phần giải thích hiện tượng trần ở mục 4.2–4.3. Hiệu năng tuyệt đối ở cả ba cấu hình và cả hai bộ phân loại là hệ quả của việc hai lớp đã tách biệt ngay từ khâu xây dựng dữ liệu, do đó chưa thể được xem là bằng chứng ủng hộ RQ1. Đối với RQ2, ngoài hiện tượng bão hòa, mỗi mẫu lớp thật trong E3 được ghép từ hai thí nghiệm khác nhau: đặc trưng giao thức lấy từ một phiên S2, còn `read_count` lấy từ một phiên S1 theo thứ tự tương ứng. Không mẫu nào trong 108 mẫu lớp thật có hai họ bằng chứng thu từ cùng một lần quan sát, nên câu hỏi về lợi ích của việc kết hợp bằng chứng chưa được kiểm định trong thiết lập hiện tại.
-
-Phân tích độ nhạy cũng cho thấy sự đồng hiện diện của một UID tại nhiều reader, tự nó, không đủ để kết luận về hành vi nhân bản, bởi một thẻ thật nằm trong vùng phủ chồng lấn tạo ra cùng một mẫu hình. Sự đồng hiện diện chỉ trở thành bằng chứng khi đi kèm một ràng buộc không gian, chẳng hạn hai reader có vùng đọc không giao nhau, hoặc hai điểm kiểm soát cách nhau một thời gian di chuyển tối thiểu. Theo cách hiểu này, bằng chứng về nhân bản mang tính quan hệ giữa danh tính, bố trí reader và thời gian, hơn là một thống kê nội tại của từng phiên đọc. Đây cũng là lý do đặc trưng chuyển tiếp bất khả thi chưa thể được xác định trên RFID-ExSim, vì tính bất khả thi của một chuyển tiếp chỉ có nghĩa khi vị trí của các reader đã được biết.
-
-Xét theo mô hình đối thủ ở mục 3.1, một bộ phát hiện dựa vào nhịp đọc và mức đầy đủ của luồng đọc có thể bị vượt qua nếu kẻ tấn công tạo ra luồng đọc có đặc điểm thời gian tương tự thẻ thật. Khả năng này nằm trong tầm kiểm soát của một đối thủ đã sao chép được UID, bởi đối thủ đó cũng quyết định thời điểm và cách thức trình diện thẻ nhân bản. Kết quả hiện tại vì vậy chưa cho phép đưa ra nhận định về khả năng chống chịu trước đối thủ thích nghi. Nhận định rằng một UID hợp lệ chưa đủ để xác lập danh tính tin cậy vẫn đứng vững, song bằng chứng hành vi dùng để bổ sung cho UID cần được xây dựng ở mức quan hệ và được kiểm soát theo nhịp đọc.
-
-Những kết quả trên gợi ý một số yêu cầu đối với việc đánh giá bộ phát hiện nhân bản dựa trên học máy. Đặc trưng của mọi lớp cần được dẫn xuất từ sự kiện thô thông qua cùng một quy trình, với cùng quy ước dấu, cửa sổ ghép cặp và độ phân giải thời gian, và kết quả truy xuất nguồn gốc đặc trưng như Bảng 4.y nên được báo cáo cùng kết quả phân loại. Bằng chứng giao thức nên được biểu diễn dưới dạng chuẩn hóa theo tốc độ đọc thay vì thống kê thô của Δ. Dữ liệu cần kèm thông tin bố trí reader để đặc trưng chuyển tiếp bất khả thi có định nghĩa vận hành, và lớp nhân bản cần được thu trên phần cứng hoặc được sinh với nhịp đọc và tỷ lệ đọc hụt tương đương thẻ thật. Các vấn đề này được thảo luận thêm ở mục 5.3 và 5.4.
+Đối với câu hỏi detector dựa vào bằng chứng an ninh nào, kết quả cho thấy trên RFID-ExSim các bộ phát hiện chưa sử dụng những bằng chứng được giả thuyết ở mục 3.3. Tín hiệu nhiều reader cùng đọc một UID xuất hiện ở cả hai lớp, vì một thẻ thật nằm trong vùng phủ chồng lấn của S2 cũng được hai reader đọc gần như đồng thời; khoảng cách thời gian giữa hai reader chỉ đúng chiều kỳ vọng trước khi chuẩn hóa theo tốc độ đọc; còn chuyển tiếp reader bất khả thi không xác định được do bộ dữ liệu không có thông tin vị trí reader. Sự đồng hiện diện của một UID chỉ trở thành bằng chứng nhân bản khi gắn với một ràng buộc không gian, nghĩa là bằng chứng nhân bản mang tính quan hệ giữa danh tính, bố trí reader và thời gian, chứ không phải thống kê của từng phiên đọc. Từ đó, hiệu năng 1.000 ở mục 4.2–4.3 chưa thể xem là bằng chứng ủng hộ RQ1. RQ2 cũng chưa được kiểm định, vì ngoài hiện tượng bão hòa, mỗi mẫu lớp thật của E3 ghép đặc trưng giao thức của một phiên S2 với `read_count` của một phiên S1. Về mặt an ninh, một đối thủ đã sao chép được UID có thể né bộ phát hiện hiện tại bằng cách tạo luồng đọc có nhịp giống thẻ thật. Các yêu cầu cho thiết kế đánh giá tiếp theo, gồm dẫn xuất đặc trưng hai lớp qua cùng một quy trình, biểu diễn bằng chứng giao thức ở dạng chuẩn hóa theo tốc độ đọc, bổ sung thông tin bố trí reader và thu lớp nhân bản trên phần cứng, được trình bày ở mục 5.3–5.4.
 
 ### References
 
 [1] R. Geirhos, J.-H. Jacobsen, C. Michaelis, R. Zemel, W. Brendel, M. Bethge, and F. A. Wichmann, "Shortcut learning in deep neural networks," *Nature Machine Intelligence*, vol. 2, no. 11, pp. 665–673, 2020.
 
-[2] L. Breiman, "Random forests," *Machine Learning*, vol. 45, no. 1, pp. 5–32, 2001.
+[2] C. Strobl, A.-L. Boulesteix, A. Zeileis, and T. Hothorn, "Bias in random forest variable importance measures: Illustrations, sources and a solution," *BMC Bioinformatics*, vol. 8, Art. no. 25, 2007.
 
-[3] C. Strobl, A.-L. Boulesteix, A. Zeileis, and T. Hothorn, "Bias in random forest variable importance measures: Illustrations, sources and a solution," *BMC Bioinformatics*, vol. 8, Art. no. 25, 2007.
+[3] G. Hooker, L. Mentch, and S. Zhou, "Unrestricted permutation forces extrapolation: Variable importance requires at least one more model, or there is no free variable importance," *Statistics and Computing*, vol. 31, no. 6, Art. no. 82, 2021.
 
-[4] G. Hooker, L. Mentch, and S. Zhou, "Unrestricted permutation forces extrapolation: Variable importance requires at least one more model, or there is no free variable importance," *Statistics and Computing*, vol. 31, no. 6, Art. no. 82, 2021.
+[4] S. M. Lundberg, G. Erion, H. Chen, A. DeGrave, J. M. Prutkin, B. Nair, R. Katz, J. Himmelfarb, N. Bansal, and S.-I. Lee, "From local explanations to global understanding with explainable AI for trees," *Nature Machine Intelligence*, vol. 2, no. 1, pp. 56–67, 2020.
 
-[5] S. M. Lundberg and S.-I. Lee, "A unified approach to interpreting model predictions," in *Advances in Neural Information Processing Systems 30 (NIPS 2017)*, 2017, pp. 4765–4774.
+[5] RFID-ExSim Dataset, "Experiment Scenarios (S1–S5)," dataset documentation, `docs/scenarios.md`.
 
-[6] S. M. Lundberg, G. Erion, H. Chen, A. DeGrave, J. M. Prutkin, B. Nair, R. Katz, J. Himmelfarb, N. Bansal, and S.-I. Lee, "From local explanations to global understanding with explainable AI for trees," *Nature Machine Intelligence*, vol. 2, no. 1, pp. 56–67, 2020.
-
-[7] RFID-ExSim Dataset, "Experiment Scenarios (S1–S5)," dataset documentation, `docs/scenarios.md`.
-
-[8] S. Kaufman, S. Rosset, C. Perlich, and O. Stitelman, "Leakage in data mining: Formulation, detection, and avoidance," *ACM Transactions on Knowledge Discovery from Data*, vol. 6, no. 4, Art. no. 15, 2012.
-
-[9] S. Kapoor and A. Narayanan, "Leakage and the reproducibility crisis in machine-learning-based science," *Patterns*, vol. 4, no. 9, Art. no. 100804, 2023.
+[6] S. Kaufman, S. Rosset, C. Perlich, and O. Stitelman, "Leakage in data mining: Formulation, detection, and avoidance," *ACM Transactions on Knowledge Discovery from Data*, vol. 6, no. 4, Art. no. 15, 2012.
 
 ---
 
-Tái lập số liệu:
-
-```bash
-export RFID_DATA=/path/to/RFID-ExSim-dataset/rfid_dataset/rfid_dataset
-cd rfid_clone_detection/analysis_4_5
-python replicate_team.py && python diagnose_team.py && python importance_team.py && python harmonize.py
-```
+Bản đầy đủ (4 bảng, dùng cho phụ lục hoặc trả lời phản biện): `4_5_feature_importance_full.md`. Script tái lập số liệu: `../analysis_4_5/`.
