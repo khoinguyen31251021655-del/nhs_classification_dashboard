@@ -44,9 +44,9 @@ Bảng 4.y. Các cơ chế tạo khả năng phân tách và tỷ trọng quy k�
 | Định nghĩa `read_count` | `read_count` | 100–154 | 50–83 | 8.7 |
 | Độ phân giải thời gian | `zero_dt_ratio` | 0.000 | 0.000–0.176 | 0.1 |
 
-Cộng dồn theo cơ chế, toàn bộ tỷ trọng quy kết SHAP của mô hình E3 thuộc về các đặc trưng chịu ảnh hưởng của những khác biệt nêu trên, trong đó cửa sổ ghép cặp chiếm 64.5% và quy ước dấu chiếm 26.6%. Các khác biệt này có thể gắn với quá trình sinh dữ liệu của từng kịch bản. Các phiên S1 được ghi trên phần cứng trong năm ngày, từ ngày 4 đến ngày 9/11/2025. Các phiên S2 nằm trong khoảng 5.6 phút theo đồng hồ hệ thống, mỗi phiên kéo dài khoảng 37 giây. Trong khi đó, toàn bộ 108 phiên S3 nằm trong khoảng 6 giây (10:38:05.6–10:38:11.9 ngày 11/11/2025), mỗi phiên có đúng 300 sự kiện và phần micro-giây của các mốc thời gian chỉ nhận 39 giá trị khác nhau, so với 1 000 giá trị ở S1 và S2. Những đặc điểm này phù hợp với giả thuyết rằng lớp nhân bản được sinh bằng phần mềm, một khả năng đã được nêu trong tài liệu mô tả bộ dữ liệu [9].
+Cộng dồn theo cơ chế, toàn bộ tỷ trọng quy kết SHAP của mô hình E3 thuộc về các đặc trưng chịu ảnh hưởng của những khác biệt nêu trên, trong đó cửa sổ ghép cặp chiếm 64.5% và quy ước dấu chiếm 26.6%. Các khác biệt này có thể gắn với quá trình sinh dữ liệu của từng kịch bản. Các phiên S1 được ghi trên phần cứng trong năm ngày, từ ngày 4 đến ngày 9/11/2025. Các phiên S2 nằm trong khoảng 5.6 phút theo đồng hồ hệ thống, mỗi phiên kéo dài khoảng 37 giây. Trong khi đó, toàn bộ 108 phiên S3 nằm trong khoảng 6 giây (10:38:05.6–10:38:11.9 ngày 11/11/2025), mỗi phiên có đúng 300 sự kiện và phần micro-giây của các mốc thời gian chỉ nhận 39 giá trị khác nhau, so với 1 000 giá trị ở S1 và S2. Những đặc điểm này phù hợp với giả thuyết rằng lớp nhân bản được sinh bằng phần mềm, một khả năng đã được nêu trong tài liệu mô tả bộ dữ liệu [7].
 
-Kết quả trên cần được đặt trong mối liên hệ với giao thức đánh giá ở mục 3.5. Trong cài đặt ban đầu, nhãn nhóm được trích từ `session_id` theo mẫu "TAG". Do mã phiên của S3 (chẳng hạn `S20251110_S3_P10_run1`) không chứa mẫu này, mỗi phiên S3 bị xem là một nhóm riêng, nên dữ liệu có 120 nhóm thay vì 12. Sau khi ánh xạ các phiên S3 về thẻ vật lý dựa trên kế hoạch thí nghiệm (`s3_plan.csv`), dữ liệu còn 12 nhóm, mỗi nhóm chứa cả hai lớp, và tập kiểm tra gồm 54 mẫu. Với phép chia đã hiệu chỉnh, cả RF và SVM vẫn đạt độ chính xác 1.000 ở cả năm hạt giống. Như vậy, việc mô hình ghi nhớ danh tính thẻ không đủ để giải thích kết quả; khả năng phân tách nhiều khả năng bắt nguồn từ khác biệt trong quá trình xây dựng dữ liệu, một dạng rò rỉ thông tin mà phép chia theo nhóm không kiểm soát được [7], [8].
+Kết quả trên cần được đặt trong mối liên hệ với giao thức đánh giá ở mục 3.5. Trong cài đặt ban đầu, nhãn nhóm được trích từ `session_id` theo mẫu "TAG". Do mã phiên của S3 (chẳng hạn `S20251110_S3_P10_run1`) không chứa mẫu này, mỗi phiên S3 bị xem là một nhóm riêng, nên dữ liệu có 120 nhóm thay vì 12. Sau khi ánh xạ các phiên S3 về thẻ vật lý dựa trên kế hoạch thí nghiệm (`s3_plan.csv`), dữ liệu còn 12 nhóm, mỗi nhóm chứa cả hai lớp, và tập kiểm tra gồm 54 mẫu. Với phép chia đã hiệu chỉnh, cả RF và SVM vẫn đạt độ chính xác 1.000 ở cả năm hạt giống. Như vậy, việc mô hình ghi nhớ danh tính thẻ không đủ để giải thích kết quả; khả năng phân tách nhiều khả năng bắt nguồn từ khác biệt trong quá trình xây dựng dữ liệu, một dạng rò rỉ thông tin mà phép chia theo nhóm không kiểm soát được [8], [9].
 
 ### 4.5.4. Phân tích độ nhạy với quy trình dẫn xuất đồng nhất
 
@@ -110,11 +110,11 @@ Những kết quả trên gợi ý một số yêu cầu đối với việc đ�
 
 [6] S. M. Lundberg, G. Erion, H. Chen, A. DeGrave, J. M. Prutkin, B. Nair, R. Katz, J. Himmelfarb, N. Bansal, and S.-I. Lee, "From local explanations to global understanding with explainable AI for trees," *Nature Machine Intelligence*, vol. 2, no. 1, pp. 56–67, 2020.
 
-[7] S. Kaufman, S. Rosset, C. Perlich, and O. Stitelman, "Leakage in data mining: Formulation, detection, and avoidance," *ACM Transactions on Knowledge Discovery from Data*, vol. 6, no. 4, Art. no. 15, 2012.
+[7] RFID-ExSim Dataset, "Experiment Scenarios (S1–S5)," dataset documentation, `docs/scenarios.md`.
 
-[8] S. Kapoor and A. Narayanan, "Leakage and the reproducibility crisis in machine-learning-based science," *Patterns*, vol. 4, no. 9, Art. no. 100804, 2023.
+[8] S. Kaufman, S. Rosset, C. Perlich, and O. Stitelman, "Leakage in data mining: Formulation, detection, and avoidance," *ACM Transactions on Knowledge Discovery from Data*, vol. 6, no. 4, Art. no. 15, 2012.
 
-[9] RFID-ExSim Dataset, "Experiment Scenarios (S1–S5)," dataset documentation, `docs/scenarios.md`.
+[9] S. Kapoor and A. Narayanan, "Leakage and the reproducibility crisis in machine-learning-based science," *Patterns*, vol. 4, no. 9, Art. no. 100804, 2023.
 
 ---
 
