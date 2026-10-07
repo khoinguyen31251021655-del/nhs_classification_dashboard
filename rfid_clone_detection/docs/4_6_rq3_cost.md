@@ -1,29 +1,27 @@
-## 4.6. RQ3 – Detection Effectiveness vs Computational Overhead
+## 4.6. Detection Effectiveness vs Computational Overhead – RQ3
 
-RQ3 xem xét quan hệ giữa hiệu quả phát hiện, tỷ lệ báo động giả và chi phí tính toán của các bộ phát hiện. Bảng 4.y so sánh bộ phát hiện giao thức E1, đại diện cho baseline MB/MCM, với RF và SVM trên đặc trưng hành vi (E2) và với cấu hình lai (Hybrid, E3). Recall và FPR được tính trên tập kiểm tra theo quy trình chia nhóm ở mục 3.5 và lấy trung bình qua năm hạt giống. Chi phí được đo trên chính các mô hình đã huấn luyện ở mục 4.3 (hạt giống 42). Thời gian xử lý là thời gian dựng vectơ đặc trưng cho một phiên từ các bản ghi va chạm, dùng đúng mã trích xuất đặc trưng của pipeline; bước ghép cặp các lượt đọc chéo không được tính vì đã được thực hiện sẵn trong các tệp tóm tắt va chạm. Thời gian suy luận là thời gian đưa ra một quyết định cho một vectơ đặc trưng. Cả hai được đo bằng trung vị của 200 lần gọi đơn lẻ trên máy chủ CPU 4 vCPU Intel Xeon 2.8 GHz, Python 3.11 và scikit-learn 1.9 [7].
+Table 7 compares E1 (MB/MCM), E2 (RF, SVM) and Hybrid E3 on detection, false alarms and computational cost. All methods reached Recall = 1.000 and FPR = 0.000 on every seed, so only cost separates them. Protocol extraction took 4.43 ms per session, while counting reads took under 0.001 ms. A decision took 0.12 ms with E1, 1.31 ms with SVM and 17.25 ms with RF. RF was also the slowest to train (322 ms) and the largest model (160.5 KB), since it stores 300 trees although each tree has only three nodes; SVM needed 2.2–4.0 KB and E1 0.22 KB. Hybrid E3 adds protocol extraction to the classifier cost without improving detection. The perfect scores do not show that the detectors are secure, because the protocol features depend on how the classes were built (Section 4.5). Detection also waits for a whole session, which lasts a median of 37 s in S2 and 6 s in S3, more than 250 times the slowest computation. Because we measured on a server CPU and not on an ESP32, the results support computational feasibility, not real-time embedded detection.
 
-Bảng 4.y. Hiệu quả phát hiện và chi phí tính toán theo phiên
+Table 7. Detection performance and computational cost per session (mean ± SD)
 
-| Phương pháp | Recall | FPR | Thời gian xử lý (ms/phiên) | Thời gian suy luận (ms/quyết định) | Cấu trúc mô hình |
-|---|---|---|---|---|---|
-| MB/MCM (E1) | 1.000 | 0.000 | 4.49 | 0.12 | 1 đặc trưng, 1 ngưỡng |
-| RF (E2) | 1.000 | 0.000 | < 0.001 | 20.67 (0.62) | 300 cây, 900 nút |
-| SVM (E2) | 1.000 | 0.000 | < 0.001 | 1.23 (0.04) | 9 vectơ hỗ trợ |
-| Hybrid – RF (E3) | 1.000 | 0.000 | 4.49 | 19.69 (0.65) | 300 cây, 900 nút |
-| Hybrid – SVM (E3) | 1.000 | 0.000 | 4.49 | 1.34 (0.07) | 11 vectơ hỗ trợ |
+| Method | Recall | FPR | Processing (ms/session) | Training (ms) | Inference (ms/decision) | Model size (KB) |
+|---|---|---|---|---|---|---|
+| MB/MCM (E1) | 1.000 | 0.000 | 4.43 ± 0.71 | 8.95 ± 2.42 | 0.12 ± 0.03 | 0.22 ± 0.00 |
+| RF (E2) | 1.000 | 0.000 | < 0.001 | 322.36 ± 14.71 | 17.25 ± 0.69 | 160.54 ± 0.09 |
+| SVM (E2) | 1.000 | 0.000 | < 0.001 | 6.05 ± 1.53 | 1.31 ± 0.39 | 2.21 ± 0.02 |
+| Hybrid – RF (E3) | 1.000 | 0.000 | 4.43 ± 0.71 | 343.09 ± 48.43 | 17.47 ± 1.68 | 160.83 ± 0.09 |
+| Hybrid – SVM (E3) | 1.000 | 0.000 | 4.43 ± 0.71 | 7.03 ± 1.95 | 1.32 ± 0.17 | 3.99 ± 0.32 |
 
-Recall và FPR có độ lệch chuẩn bằng 0 trên năm hạt giống. Giá trị trong ngoặc là thời gian trung bình mỗi mẫu khi dự đoán theo lô trên tập kiểm tra.
+Note. Recall and FPR: five group-aware splits (SD = 0). Processing: building one session's feature vector, over 216 sessions. Training: one fit on the training set; inference: one decision for one session; model size: pickled model; each over five seeds. All values come from one run on 4 vCPU Intel Xeon 2.10 GHz, Python 3.11, scikit-learn 1.9 [26].
 
-Do mọi phương pháp đều đạt Recall 1.000 và FPR 0.000, trục hiệu quả và trục báo động giả không phân biệt được các phương pháp, và sự đánh đổi của RQ3 chỉ còn thể hiện trên trục chi phí. Chi phí của bằng chứng giao thức nằm chủ yếu ở khâu trích xuất đặc trưng: tính 13 thống kê va chạm cho một phiên mất 4.49 ms khi gọi đơn lẻ (0.77 ms/phiên khi xử lý theo lô), trong khi đặc trưng hành vi `read_count` chỉ là một phép đếm, tốn dưới 1 µs. Ở khâu suy luận, ngưỡng E1 mất 0.12 ms, SVM mất 1.23–1.34 ms, còn RF mất khoảng 20 ms. Khoảng cách của RF chủ yếu do chi phí gọi tuần tự 300 cây trong scikit-learn, vì khi dự đoán theo lô thời gian mỗi mẫu chỉ còn 0.62–0.65 ms. Cấu hình Hybrid cộng dồn chi phí của cả hai khâu, tổng cộng khoảng 24.2 ms/phiên với RF và 5.8 ms/phiên với SVM, nhưng không cải thiện Recall hay FPR so với E2. Cấu trúc mô hình cũng cho thấy bài toán không đòi hỏi độ phức tạp này: mọi cây trong rừng chỉ có ba nút, tức một phép so sánh ngưỡng duy nhất, nên 300 cây là dư thừa, và SVM chỉ cần 9–11 vectơ hỗ trợ. Kết quả này nhất quán với nhận định ở mục 4.5 rằng hai lớp tách được bằng một ngưỡng trên nhiều đặc trưng khác nhau.
+## 5.1. Answer to RQ3 (replaces "The study did not measure computational time or model size")
 
-Hai giới hạn quyết định cách diễn giải Bảng 4.y. Thứ nhất, các giá trị Recall và FPR không thể xem là hiệu quả an ninh: mục 4.5 cho thấy đặc trưng mà E1 sử dụng (`negative_dt_ratio`) chỉ còn AUC 0.546 khi hai lớp được xử lý đồng nhất. Vì vậy, Bảng 4.y không cho phép kết luận rằng baseline giao thức đạt cùng mức an ninh với chi phí thấp nhất; phần có giá trị của bảng là các số đo chi phí, vốn không phụ thuộc vào tính hợp lệ của nhãn. Thứ hai, độ trễ ra quyết định trong triển khai bị chi phối bởi thời gian quan sát hơn là thời gian tính toán. Các bộ phát hiện hoạt động ở mức phiên, nên chỉ đưa ra quyết định sau khi phiên kết thúc. Trung vị độ dài phiên là 37 giây ở S2 và 6 giây ở S3, cao hơn chi phí tính toán từ khoảng hai đến năm bậc độ lớn. Hơn nữa, các phép đo được thực hiện trên CPU máy chủ, không phải trên ESP32 hay phần cứng tại điểm kiểm soát. Kích thước của các mô hình (tối đa 900 nút cây hoặc 11 vectơ hỗ trợ) là nhỏ so với bộ nhớ SRAM 520 KB của ESP32 [8], nhưng chưa có phép đo nào trên thiết bị nhúng. Do đó, kết quả chỉ hỗ trợ nhận định về tính khả thi tính toán cho triển khai định hướng điểm kiểm soát (computational feasibility for checkpoint-oriented deployment), không hỗ trợ tuyên bố về khả năng phát hiện thời gian thực.
+RQ3: Does the security benefit come with an acceptable computational overhead? The computational overhead is acceptable for checkpoint deployment. With feature extraction included, one decision took 1.3–21.9 ms per session on a server CPU. Training took about 0.3 s for RF and under 10 ms for the other methods, and the largest model (RF) was 160.5 KB, while E1 and SVM needed 0.2–4.0 KB (Table 7). These costs are small next to the 6–37 s needed to observe a session. The security benefit is not established, however, because the perfect scores in RQ1 and RQ2 reflect how the dataset was built. RQ3 therefore shows computational feasibility only; ESP32 deployment and real-time detection were not tested.
 
-### References (tiếp nối mục 4.5)
+## Related sentence in Future Work
 
-[7] F. Pedregosa, G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O. Grisel, M. Blondel, P. Prettenhofer, R. Weiss, V. Dubourg, J. Vanderplas, A. Passos, D. Cournapeau, M. Brucher, M. Perrot, and É. Duchesnay, "Scikit-learn: Machine learning in Python," *Journal of Machine Learning Research*, vol. 12, pp. 2825–2830, 2011.
-
-[8] Espressif Systems, *ESP32 Series Datasheet*, Espressif Systems, Shanghai, China.
+"So far, we have only tested on Google Colab." → "So far, costs were measured only on a server CPU."
 
 ---
 
-Số liệu lấy từ Part I (cell 25–29) của `../notebooks/RFID_Evidence_Ablation_Colab_1_RQ3.ipynb`, tức notebook của nhóm được gắn thêm phần đo RQ3 và chạy toàn bộ.
+Source: Part J (Cell 30) of `../notebooks/RFID_Evidence_Ablation_Colab_1_RQ3.ipynb`, which measures every value in Table 7 in a single run and prints the table in this format. Per-seed values are saved to `rq3_table7_runs.csv` and the summary to `rq3_table7_summary.csv`. The value in parentheses in the earlier table, e.g. `23.04 (0.49)`, was the per-sample time for batch prediction, not an SD; in this run it is 0.45 ms for RF (E2) and 0.49 ms for Hybrid RF (E3). If the paper reports Colab as the environment, re-run Cell 30 on Colab and replace every number in the table, the text and the RQ3 answer with that run's output.
